@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { 
   Menu, 
   X, 
+  ChevronLeft,
   ChevronRight, 
   Mail, 
   Phone, 
   Globe, 
   CheckCircle,
   MapPin,
-  Clock,
   ShieldCheck,
   Eye,
   Award,
@@ -17,8 +17,77 @@ import {
   Check,
   Sparkles,
   Maximize2,
-  MessageCircle
+  Loader2,
+  FileText
 } from 'lucide-react';
+import { generateCatalogPdf } from './generateCatalogPdf';
+
+const GLASS_VIEWS = ['FrontalView', 'AngledView', 'InteriorView'];
+
+const glassImages = (base) =>
+  GLASS_VIEWS.map(
+    (view) => `/glasses/${encodeURIComponent(`${base}_${view}(300dpi).jpg`)}`
+  );
+
+function ProductImageCarousel({ images, alt, onImageClick, className = '', imgClassName = '', initialIndex = 0 }) {
+  const [index, setIndex] = useState(initialIndex);
+  const imgs = images?.length ? images : [];
+  if (!imgs.length) return null;
+
+  const go = (e, delta) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIndex((i) => (i + delta + imgs.length) % imgs.length);
+  };
+
+  return (
+    <div className={`relative w-full h-full flex items-center justify-center ${className}`}>
+      <img
+        src={imgs[index]}
+        alt={alt}
+        className={imgClassName}
+        onClick={() => onImageClick?.(imgs[index], index, imgs)}
+        draggable={false}
+      />
+      {imgs.length > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Önceki resim"
+            onClick={(e) => go(e, -1)}
+            className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-700 hover:text-[#1e40af] transition"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Sonraki resim"
+            onClick={(e) => go(e, 1)}
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-700 hover:text-[#1e40af] transition"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5">
+            {imgs.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Resim ${i + 1}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIndex(i);
+                }}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? 'w-4 bg-[#1e40af]' : 'w-1.5 bg-slate-300 hover:bg-slate-400'
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,560 +96,492 @@ export default function App() {
   const [catalogModalOpen, setCatalogModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [enlargedImage, setEnlargedImage] = useState(null);
-  const [catalogFormSubmitted, setCatalogFormSubmitted] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [catalogGenerating, setCatalogGenerating] = useState(false);
+  const [catalogProgress, setCatalogProgress] = useState(0);
+  const [catalogError, setCatalogError] = useState(null);
+  const [catalogFileName, setCatalogFileName] = useState(null);
 
   // WhatsApp Link Handler
   const whatsappUrl = "https://wa.me/905395895502?text=Merhaba,%20OptiSafe%20numaralı%20iş%20güvenliği%20gözlükleri%20hakkında%20bilgi%20almak%20istiyorum.";
 
   // OptiSafe All Main Products & Sub-Models Collection (Direct & Complete from optisafe.com.tr)
   const products = [
-    // ---------------------------------------------------------
-    // UNIVET PRODUCTS & SUB-MODELS (8 Sub-models + 1 Main Series)
-    // ---------------------------------------------------------
     {
-      id: 'univet-main',
-      brand: 'Univet',
-      name: 'Univet Numaralı Koruyucu Gözlük Serisi',
-      code: 'OPT-UNI-SERIES',
-      category: 'univet',
+      id: '158-03-organik-hermetic',
+      brand: 'Pegaso',
+      name: 'Organik Hermetic 158.03',
+      code: 'REF-158.03',
+      category: 'hermetic',
       rxSupport: true,
-      tag: 'İtalyan Tasarımı Ana Seri',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/univet1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/univet.jpg',
-      desc: 'Kişiye özel diyoptri değerlerine göre üretilen, darbelere dayanıklı İtalyan tasarımı profesyonel koruyucu gözlükler.',
+      tag: 'Sıvı & Toz Korumalı',
+      badgeBg: 'bg-cyan-700',
+      variant: 'Foam Temple/Band · Tek Beden',
+      images: glassImages('Prescription Ref.158.03_Organik-Hermetic_WithFoam'),
+      img: glassImages('Prescription Ref.158.03_Organik-Hermetic_WithFoam')[0],
+      detailImg: glassImages('Prescription Ref.158.03_Organik-Hermetic_WithFoam')[0],
+      desc: 'Bio-based TR-90 poliamid gövdeli, hermetik foam contalı numaralı iş güvenliği gözlüğü. Toz ve sıvı sıçramalarına karşı tam koruma sunar; 8 saatlik kullanımda yüksek konfor sağlar.',
       specs: {
-        standard: 'EN166 1F / ANSI Z87.1',
-        prescription: 'Kişiye Özel OptiSafe Mercek Entegrasyonu',
-        impact: 'F Sınıfı Mekanik Koruma (45 m/s)',
-        coating: 'Buğu Önleyici & Antistatik (Vanguard Technology)',
-        weight: '28g'
+        standard: 'EN166 3 4 F T',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek hızlı parçacık direnci (F T)',
+        coating: 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
+        frame: 'Bio-based TR-90 poliamid',
+        size: 'Tek beden · Kalibre 56',
+        protection: 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
       },
-      features: [
-        'Kişiye özel numaralı camlar',
-        'Darbe koruma (EN166 standardı)',
-        'UV koruma',
-        'Hafif ve ergonomik tasarım',
-        '8 farklı model seçeneği'
-      ],
-      models: [
-        { id: 101, title: '5X1', img: 'https://www.optisafe.com.tr/images/5x1.jpg' },
-        { id: 102, title: '5X1 TECHNICAL', img: 'https://www.optisafe.com.tr/images/5x1_technical.jpg' },
-        { id: 103, title: '5X9 HYBRID', img: 'https://www.optisafe.com.tr/images/5x9_hybrid.jpg' },
-        { id: 104, title: '5X9', img: 'https://www.optisafe.com.tr/images/5x9.jpg' },
-        { id: 105, title: '536 METAL', img: 'https://www.optisafe.com.tr/images/536_metal.jpg' },
-        { id: 106, title: '539', img: 'https://www.optisafe.com.tr/images/539.jpg' },
-        { id: 107, title: '555', img: 'https://www.optisafe.com.tr/images/555.jpg' },
-        { id: 108, title: '572', img: 'https://www.optisafe.com.tr/images/572.jpg' }
-      ]
+      features: ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', 'Ayarlanabilir elastik kafa bandı', 'Sap + bant çift bağlantı seçeneği', 'PRIVILEGE çizilmez & buğulanmaz kaplama', 'Mavi ışık filtresi (Bluestop)', 'Organik, polikarbonat veya Trivex numaralı lens']
     },
     {
-      id: 'univet-5x1',
-      brand: 'Univet',
-      name: 'Univet 5X1 Numaralı İş Gözlüğü',
-      code: 'UNI-5X1',
-      category: 'univet',
+      id: '158-08-organik-hermetic',
+      brand: 'Pegaso',
+      name: 'Organik Hermetic 158.08',
+      code: 'REF-158.08',
+      category: 'hermetic',
       rxSupport: true,
-      tag: 'Univet Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/5x1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/5x1.jpg',
-      desc: 'Ergonomik sap yapısı ve geniş görüş açısı sunan kişiye özel numaralı cam montajına uygun Univet 5X1 modeli.',
+      tag: 'Sıvı & Toz Korumalı',
+      badgeBg: 'bg-cyan-700',
+      variant: 'Foam Band · Tek Beden',
+      images: glassImages('Prescription Ref.158.08_Organik-Hermetic'),
+      img: glassImages('Prescription Ref.158.08_Organik-Hermetic')[0],
+      detailImg: glassImages('Prescription Ref.158.08_Organik-Hermetic')[0],
+      desc: 'Hermetik foam contalı ve bant bağlantılı Organik Hermetic modeli. Ultra dayanıklı gövde ile sıvı ve toz koruması; EN166 sertifikalı numaralı/plano kullanım.',
       specs: {
-        standard: 'EN166 1FT K N',
-        prescription: 'Rx Numaralı Lens Entegre',
-        impact: 'Mekanik Darbe Direnci',
-        coating: 'Vanguard Plus Buğu Önleyici',
-        weight: '29g'
+        standard: 'EN166 3 4 F T',
+        prescription: 'Organik / Polikarbonat numaralı lens',
+        impact: 'Yüksek hızlı parçacık direnci (F T)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'TR-90 poliamid',
+        size: 'Tek beden · Kalibre 56',
+        protection: 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
       },
-      features: ['Patentli sap eğimi ayarı', 'Yumuşak burun yastığı', 'Çizilmez & buğulanmaz lens']
+      features: ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', 'Ayarlanabilir elastik bant bağlantısı', 'Sıvı ve toz sızdırmazlık', 'Çizilmez & buğulanmaz lens seçenekleri']
     },
     {
-      id: 'univet-5x1-tech',
-      brand: 'Univet',
-      name: 'Univet 5X1 TECHNICAL Koruyucu Gözlük',
-      code: 'UNI-5X1-TECH',
-      category: 'univet',
+      id: '158-01-organik',
+      brand: 'Pegaso',
+      name: 'Organik 158.01',
+      code: 'REF-158.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Univet Model',
+      tag: 'Darbe Korumalı',
       badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/5x1_technical.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/5x1_technical.jpg',
-      desc: 'Zorlu teknik ortamlarda ekstra sızdırmazlık ve konfor sağlayan elastik kafa bantlı 5X1 Technical model.',
+      variant: 'Without Foam · Tek Beden',
+      images: glassImages('Prescription Ref.158.01_Organik_WithoutFoam'),
+      img: glassImages('Prescription Ref.158.01_Organik_WithoutFoam')[0],
+      detailImg: glassImages('Prescription Ref.158.01_Organik_WithoutFoam')[0],
+      desc: 'Foam contasız Organik modeli. Darbe koruması gereken atölye ve saha işleri için hafif, dielektrik TR-90 gövde. Sıvı/toz sızdırmazlık gerektirmeyen kullanımlar için idealdir.',
       specs: {
-        standard: 'EN166 1FT K N / EN170',
-        prescription: 'Rx Optik Eklenti Uyumlu',
-        impact: 'Yüksek Hızlı Parçacık Koruması',
-        coating: 'Çift Taraflı Vanguard Ultra',
-        weight: '32g'
+        standard: 'EN166 F T',
+        prescription: 'Organik / Polikarbonat numaralı lens',
+        impact: 'Mekanik darbe direnci (F T)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'TR-90 poliamid',
+        size: 'Tek beden · Kalibre 56',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Çıkarılabilir kafa bandı', 'Yumuşak conta çevresi', 'Terleme önleyici havalandırma kanalları']
+      features: ['Foam contasız hafif tasarım', 'Dielektrik yapı', 'Kaymaz burun pedi', 'EN166 F T darbe işareti', 'Numaralı lens uyumlu']
     },
     {
-      id: 'univet-5x9-hybrid',
-      brand: 'Univet',
-      name: 'Univet 5X9 HYBRID Gözlük',
-      code: 'UNI-5X9-HYB',
-      category: 'univet',
+      id: '211-02-organik-hermetic-pro',
+      brand: 'Pegaso',
+      name: 'Organik Hermetic PRO 211.02',
+      code: 'REF-211.02',
+      category: 'hermetic',
       rxSupport: true,
-      tag: 'Univet Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/5x9_hybrid.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/5x9_hybrid.jpg',
-      desc: 'Gözlük sapları ve elastik kafa bandı değişimli hibrit koruyucu gözlük konsepti.',
+      tag: 'PRO · Sıvı & Toz',
+      badgeBg: 'bg-emerald-700',
+      variant: 'Foam Temple/Band · Tek Beden',
+      images: glassImages('Prescription Ref.211.02_Organik-Hermetic-PRO_WithFoam'),
+      img: glassImages('Prescription Ref.211.02_Organik-Hermetic-PRO_WithFoam')[0],
+      detailImg: glassImages('Prescription Ref.211.02_Organik-Hermetic-PRO_WithFoam')[0],
+      desc: 'Organik Hermetic PRO: çevre dostu BIOBALANCE gövde, çevresel foam conta ve sap/bant çift bağlantı. 8 saatlik ergonomi; EN ISO 16321 sertifikalı.',
       specs: {
-        standard: 'EN166 1F / ANSI Z87.1',
-        prescription: 'Numaralı Cam Takılabilir',
-        impact: 'Kimyasal & Sıvı Sıçrama Direnci',
-        coating: 'Vanguard Buğu & Çizilmez',
-        weight: '31g'
+        standard: 'EN166 / EN ISO 16321 · U1.2 G3 C T 3 4',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'PRIVILEGE buğulanmaz & çizilmez, Bluestop, antirefle, hidrofobik',
+        frame: 'BIOBALANCE eko-sürdürülebilir malzeme',
+        size: 'Tek beden',
+        protection: 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
       },
-      features: ['Hibrit sap / bant dönüşümü', 'Contalı conta koruma', 'Çok yönlü endüstriyel kullanım']
+      features: ['BIOBALANCE eko çerçeve', 'Dielektrik yapı', 'Çevresel hermetik foam conta', 'Sap + elastik bant çift bağlantı', 'PRIVILEGE kaplama', 'EN ISO 16321 sertifikası', '8 saatlik üstün konfor']
     },
     {
-      id: 'univet-5x9',
-      brand: 'Univet',
-      name: 'Univet 5X9 Numaralı İş Güvenliği Gözlüğü',
-      code: 'UNI-5X9',
-      category: 'univet',
+      id: '211-01-organik-pro',
+      brand: 'Pegaso',
+      name: 'Organik PRO 211.01',
+      code: 'REF-211.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Univet Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/5x9.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/5x9.jpg',
-      desc: 'Şık ve modern tasarımıyla öne çıkan, numaralı cam yuvalı klasik 5X9 güvenlik gözlüğü.',
+      tag: 'PRO · Şeffaf',
+      badgeBg: 'bg-emerald-700',
+      variant: 'Transparent · Tek Beden',
+      images: glassImages('Prescription Ref.211.01_Organik-PRO'),
+      img: glassImages('Prescription Ref.211.01_Organik-PRO')[0],
+      detailImg: glassImages('Prescription Ref.211.01_Organik-PRO')[0],
+      desc: 'Foam ve bant olmadan günlük kullanıma uygun hafif Organik PRO. Modern tasarım, rahat saplar ve eko-sürdürülebilir BIOBALANCE gövde. EN ISO 16321 sertifikalı.',
       specs: {
-        standard: 'EN166 1F K N',
-        prescription: 'Rx +6.00 / -6.00 Uyumlu',
-        impact: 'Mekanik Darbe Direnci',
-        coating: 'Sertleştirilmiş Çizilmez Kaplama',
-        weight: '28g'
+        standard: 'EN166 / EN ISO 16321 · U1.2 G3 C T',
+        prescription: 'Polikarbonat / Organik / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
+        frame: 'BIOBALANCE eko-sürdürülebilir malzeme',
+        size: 'Tek beden',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Yan siperli gövde', 'Farklı renk seçenekleri', 'Ayarlanabilir kulak sapları']
+      features: ['BIOBALANCE eko çerçeve', 'Dielektrik yapı', 'Foam / bant yok — hafif günlük kullanım', 'Modern, konforlu sap tasarımı', 'PRIVILEGE kaplama', 'Mikrofiber kılıf (ACC.04) dahil', 'EN ISO 16321 sertifikası']
     },
     {
-      id: 'univet-536-metal',
-      brand: 'Univet',
-      name: 'Univet 536 METAL Çerçeveli Gözlük',
-      code: 'UNI-536-MTL',
-      category: 'univet',
+      id: '207-01-compact-pro',
+      brand: 'Pegaso',
+      name: 'Compact PRO 207.01',
+      code: 'REF-207.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Metal Çerçeve',
+      tag: 'Small · Mavi/Şeffaf',
+      badgeBg: 'bg-indigo-600',
+      variant: 'Blue/Transparent · Small',
+      images: glassImages('Prescription Ref.207.01_Compact-PRO'),
+      img: glassImages('Prescription Ref.207.01_Compact-PRO')[0],
+      detailImg: glassImages('Prescription Ref.207.01_Compact-PRO')[0],
+      desc: 'Compact PRO Small beden, mavi/şeffaf. Bio-based gövde, 8 saatlik ergonomi ve PRIVILEGE kaplama. İki beden seçeneği olan PRO serisinin küçük boyutu.',
+      specs: {
+        standard: 'EN ISO 16321 C T',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
+        frame: 'Bio-based malzeme',
+        size: 'Small · Kalibre 51',
+        protection: 'Darbe / mekanik parçacık koruması',
+      },
+      features: ['Bio-based dielektrik gövde', 'Modern Compact PRO tasarımı', 'Small / Large iki beden seçeneği', 'PRIVILEGE çizilmez & buğulanmaz', 'EN ISO 16321 sertifikası']
+    },
+    {
+      id: '207-02-compact-pro',
+      brand: 'Pegaso',
+      name: 'Compact PRO 207.02',
+      code: 'REF-207.02',
+      category: 'impact',
+      rxSupport: true,
+      tag: 'Small · Gri',
+      badgeBg: 'bg-indigo-600',
+      variant: 'Grey · Small',
+      images: glassImages('Prescription Ref.207.02_Compact-PRO'),
+      img: glassImages('Prescription Ref.207.02_Compact-PRO')[0],
+      detailImg: glassImages('Prescription Ref.207.02_Compact-PRO')[0],
+      desc: 'Compact PRO Small beden, gri. Bio-based gövde ve PRIVILEGE kaplama; G3 güneş filtresi işaretli varyant. EN ISO 16321 sertifikalı.',
+      specs: {
+        standard: 'EN ISO 16321 G3 C T',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
+        frame: 'Bio-based malzeme',
+        size: 'Small · Kalibre 51',
+        protection: 'Darbe koruması · G3 solar filtre seçeneği',
+      },
+      features: ['Bio-based dielektrik gövde', 'Gri Compact PRO Small', 'PRIVILEGE kaplama', 'G3 solar / fotokromik / polarize filtre seçenekleri', 'EN ISO 16321 sertifikası']
+    },
+    {
+      id: '207-03-compact-pro',
+      brand: 'Pegaso',
+      name: 'Compact PRO 207.03',
+      code: 'REF-207.03',
+      category: 'impact',
+      rxSupport: true,
+      tag: 'Large · Mavi/Şeffaf',
+      badgeBg: 'bg-indigo-600',
+      variant: 'Blue/Transparent · Large',
+      images: glassImages('Prescription Ref.207.03_Compact-PRO'),
+      img: glassImages('Prescription Ref.207.03_Compact-PRO')[0],
+      detailImg: glassImages('Prescription Ref.207.03_Compact-PRO')[0],
+      desc: 'Compact PRO Large beden, mavi/şeffaf. Daha geniş yüz yapısı için Large kalibre; bio-based gövde ve PRIVILEGE kaplama.',
+      specs: {
+        standard: 'EN ISO 16321 C T',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
+        frame: 'Bio-based malzeme',
+        size: 'Large · Kalibre 55',
+        protection: 'Darbe / mekanik parçacık koruması',
+      },
+      features: ['Bio-based dielektrik gövde', 'Large beden — geniş yüz uyumu', 'PRIVILEGE çizilmez & buğulanmaz', 'Modern Compact PRO tasarımı', 'EN ISO 16321 sertifikası']
+    },
+    {
+      id: '207-04-compact-pro',
+      brand: 'Pegaso',
+      name: 'Compact PRO 207.04',
+      code: 'REF-207.04',
+      category: 'impact',
+      rxSupport: true,
+      tag: 'Large · Gri',
+      badgeBg: 'bg-indigo-600',
+      variant: 'Grey · Large',
+      images: glassImages('Prescription Ref.207.04_Compact-PRO'),
+      img: glassImages('Prescription Ref.207.04_Compact-PRO')[0],
+      detailImg: glassImages('Prescription Ref.207.04_Compact-PRO')[0],
+      desc: 'Compact PRO Large beden, gri. Endüstriyel numaralı güvenlik gözlüğü; bio-based gövde, PRIVILEGE kaplama ve G3 solar filtre seçenekleri.',
+      specs: {
+        standard: 'EN ISO 16321 G3 C T',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
+        frame: 'Bio-based malzeme',
+        size: 'Large · Kalibre 55',
+        protection: 'Darbe koruması · G3 solar filtre seçeneği',
+      },
+      features: ['Bio-based dielektrik gövde', 'Gri Compact PRO Large', 'PRIVILEGE kaplama', 'Fotokromik / polarize / solar filtre seçenekleri', 'EN ISO 16321 sertifikası']
+    },
+    {
+      id: '139-01-brave',
+      brand: 'Pegaso',
+      name: 'Brave 139.01',
+      code: 'REF-139.01',
+      category: 'impact',
+      rxSupport: true,
+      tag: 'Siyah · Tek Beden',
       badgeBg: 'bg-slate-700',
-      img: 'https://www.optisafe.com.tr/images/536_metal.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/536_metal.jpg',
-      desc: 'Metal alaşımlı klasik çerçeve yapısı ile şeffaf yan siperlikli numaralı iş gözlüğü.',
+      variant: 'Black · Tek Beden',
+      images: glassImages('Prescription Ref.139.01_Brave'),
+      img: glassImages('Prescription Ref.139.01_Brave')[0],
+      detailImg: glassImages('Prescription Ref.139.01_Brave')[0],
+      desc: 'TR-90 poliamid Brave modeli: modern, hafif tasarım; yan siperlikler ve geniş görüş alanı. Atölye ve ofis kullanımı için ideal darbe korumalı numaralı gözlük.',
       specs: {
-        standard: 'EN166 1F',
-        prescription: 'Tam Numaralı Optik Uyumlu',
-        impact: 'Düşük Enerjili Darbe Direnci',
-        coating: 'Standart Çizilmezlik',
-        weight: '34g'
+        standard: 'EN166 F',
+        prescription: 'Organik / Polikarbonat numaralı lens',
+        impact: 'Mekanik darbe direnci (F)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'TR-90 poliamid',
+        size: 'Tek beden · Kalibre 56',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Metal alaşımlı sağlam gövde', 'Şeffaf yan korumalar', 'Klasik gözlük estetiği']
+      features: ['TR-90 hafif gövde', 'Yan siperlikler', 'Geniş görüş alanı', 'Modern ofis / atölye tasarımı', 'Numaralı lens uyumlu']
     },
     {
-      id: 'univet-539',
-      brand: 'Univet',
-      name: 'Univet 539 Koruyucu Gözlük',
-      code: 'UNI-539',
-      category: 'univet',
+      id: '125-01-brave-small',
+      brand: 'Pegaso',
+      name: 'Brave Small 125.01',
+      code: 'REF-125.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Univet Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/539.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/539.jpg',
-      desc: 'Klasik polikarbonat çerçeveli, hafif ve dayanıklı numaralı iş güvenlik gözlüğü.',
+      tag: 'Siyah · Small Fit',
+      badgeBg: 'bg-slate-700',
+      variant: 'Black · Small Fit',
+      images: glassImages('Prescription Ref.125.01_Brave-Small'),
+      img: glassImages('Prescription Ref.125.01_Brave-Small')[0],
+      detailImg: glassImages('Prescription Ref.125.01_Brave-Small')[0],
+      desc: 'Brave Small: daha küçük yüz yapıları için biobased poliamid gövde. Yan siperlikler, kordon ve geniş görüş alanı; atölye ve ofis için hafif darbe koruması.',
       specs: {
-        standard: 'EN166 1F',
-        prescription: 'Rx Numaralı Entegre',
-        impact: 'Mekanik Darbe Direnci',
-        coating: 'Anti-Scratch Sert Kaplama',
-        weight: '27g'
+        standard: 'EN166 F',
+        prescription: 'Organik / Polikarbonat numaralı lens',
+        impact: 'Mekanik darbe direnci (F)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'Biobased poliamid',
+        size: 'Small fit · Kalibre 54',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Hafif tasarım', 'Geniş görüş açısı', 'Ekonomik koruma']
+      features: ['Biobased hafif gövde', 'Yan siperlikler', 'Kordon dahil', 'Küçük yüz uyumu (Cal.54)', 'Geniş görüş alanı']
     },
     {
-      id: 'univet-555',
-      brand: 'Univet',
-      name: 'Univet 555 Ergonomik İş Gözlüğü',
-      code: 'UNI-555',
-      category: 'univet',
+      id: '144-01-fever',
+      brand: 'Pegaso',
+      name: 'Fever 144.01',
+      code: 'REF-144.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Univet Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/555.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/555.jpg',
-      desc: 'Maksimum yüz uyumu ve hafiflik sunan numaralı cam montajlı 555 modeli.',
+      tag: 'Siyah · Kompakt',
+      badgeBg: 'bg-slate-700',
+      variant: 'Black · Tek Beden',
+      images: glassImages('Prescription Ref.144.01_Fever'),
+      img: glassImages('Prescription Ref.144.01_Fever')[0],
+      detailImg: glassImages('Prescription Ref.144.01_Fever')[0],
+      desc: 'Fever: TR-90 poliamid, kompakt kalibre 49. Modern hafif tasarım, yan siperlikler ve geniş görüş; atölye ve ofis darbe koruması.',
       specs: {
-        standard: 'EN166 1F K',
-        prescription: 'Numaralı Cam Yuvası',
-        impact: 'FT Mekanik Sınıf',
-        coating: 'Çizilmez Sert Kaplama',
-        weight: '26g'
+        standard: 'EN166 F',
+        prescription: 'Organik / Polikarbonat numaralı lens',
+        impact: 'Mekanik darbe direnci (F)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'TR-90 poliamid',
+        size: 'Tek beden · Kalibre 49',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Kaymaz sap pedleri', 'Ergonomik yüz kavrama', 'Yüksek görüş netliği']
+      features: ['TR-90 hafif gövde', 'Kompakt kalibre 49', 'Yan siperlikler', 'Modern tasarım', 'Geniş görüş alanı']
     },
     {
-      id: 'univet-572',
-      brand: 'Univet',
-      name: 'Univet 572 Numaralı Güvenlik Gözlüğü',
-      code: 'UNI-572',
-      category: 'univet',
+      id: '2009-01-europa',
+      brand: 'Pegaso',
+      name: 'Europa 2009.01',
+      code: 'REF-2009.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Univet Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/572.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/572.jpg',
-      desc: 'Şık siyah-kırmızı çerçeve hatları ile yüksek dayanıklılık sunan 572 numaralı koruyucu gözlük.',
+      tag: 'Gri/Kırmızı',
+      badgeBg: 'bg-rose-700',
+      variant: 'Grey/Red · Tek Beden',
+      images: glassImages('Prescription Ref.2009.01_Europa'),
+      img: glassImages('Prescription Ref.2009.01_Europa')[0],
+      detailImg: glassImages('Prescription Ref.2009.01_Europa')[0],
+      desc: 'Europa: naylon gövdeli klasik tasarım, ergonomik saplar ve yan siperlikler. ISO 16321 darbe korumalı numaralı iş güvenliği gözlüğü.',
       specs: {
-        standard: 'EN166 1F K N',
-        prescription: 'Rx Numaralı Entegre',
-        impact: 'Mekanik Darbe Koruması',
-        coating: 'Vanguard Anti-Fog & Anti-Scratch',
-        weight: '30g'
+        standard: 'EN ISO 16321 C T',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'Naylon',
+        size: 'Tek beden · Kalibre 55',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Şık dinamik tasarım', 'Entegre yan korumalar', 'Ergonomik kulak pedleri']
+      features: ['Naylon klasik gövde', 'Yan siperlikler', 'Ergonomik saplar', 'Gri/kırmızı renk kombinasyonu', 'ISO 16321 sertifikası']
     },
-
-    // ---------------------------------------------------------
-    // BOLLÉ SAFETY PRODUCTS & SUB-MODELS (4 Sub-models + 1 Main Series)
-    // ---------------------------------------------------------
     {
-      id: 'bolle-main',
-      brand: 'Bollé Safety',
-      name: 'Bollé Numaralı İş Güvenlik Gözlüğü Serisi',
-      code: 'OPT-BOL-SERIES',
-      category: 'bolle',
+      id: '9r50-01-normal',
+      brand: 'Pegaso',
+      name: 'Normal 9R50.01',
+      code: 'REF-9R50.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Platinum Buğu Önleyici Ana Seri',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/bolle1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/bolle.jpg',
-      desc: 'Yüksek performanslı lens teknolojisi ve Platinum kaplama konforunu bir arada sunan profesyonel koruyucu gözlük serisi.',
+      tag: 'Gri/Kırmızı · Yüksek Diyoptri',
+      badgeBg: 'bg-rose-700',
+      variant: 'Grey/Red · Tek Beden',
+      images: glassImages('Prescription Ref.9R50.01_Normal'),
+      img: glassImages('Prescription Ref.9R50.01_Normal')[0],
+      detailImg: glassImages('Prescription Ref.9R50.01_Normal')[0],
+      desc: 'Normal 9R50: naylon klasik çerçeve, yan siperlikler ve yüksek diyoptri desteği. İki beden seçeneği ile geniş reçete aralığına uygun numaralı güvenlik gözlüğü.',
       specs: {
-        standard: 'EN166 1FT K N',
-        prescription: 'Optik Mağaza Reçetelerine Uyumlu',
-        impact: 'Ağır Sanayi Darbe Sınıfı',
-        coating: 'Platinum (Çizilmez ve Buğulanmaz K&N)',
-        weight: '27g'
+        standard: 'EN166 F',
+        prescription: 'Organik / Polikarbonat — yüksek diyoptri uyumlu',
+        impact: 'Mekanik darbe direnci (F)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'Naylon',
+        size: 'Tek beden · Kalibre 51 (2 beden seçeneği)',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: [
-        'Platinum kaplama teknolojisi',
-        'Buğu önleyici ve çizilmez',
-        'Panoramik görüş açısı',
-        'Spor ve şık tasarım',
-        '4 farklı model seçeneği'
-      ],
-      models: [
-        { id: 401, title: 'Kurt', img: 'https://www.optisafe.com.tr/images/bolle_1.png' },
-        { id: 402, title: 'Klassee', img: 'https://www.optisafe.com.tr/images/bolle_2.jpg' },
-        { id: 403, title: 'STKS 420', img: 'https://www.optisafe.com.tr/images/bolle_3.jpg' },
-        { id: 404, title: 'Kover RX', img: 'https://www.optisafe.com.tr/images/bolle_4.jpg' }
-      ]
+      features: ['Naylon klasik gövde', 'Yan siperlikler', 'Yüksek diyoptri / reçete desteği', '2 beden seçeneği', 'Gri/kırmızı renk']
     },
     {
-      id: 'bolle-kurt',
-      brand: 'Bollé Safety',
-      name: 'Bollé Kurt Numaralı İş Gözlüğü',
-      code: 'BOL-KURT',
-      category: 'bolle',
+      id: '140-01-aguila',
+      brand: 'Pegaso',
+      name: 'Aguila 140.01',
+      code: 'REF-140.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Bollé Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/bolle_1.png',
-      detailImg: 'https://www.optisafe.com.tr/images/bolle_1.png',
-      desc: 'Modern spor tasarımı ve tam yüz koruması sunan Bollé Kurt numaralı güvenlik gözlüğü.',
+      tag: 'Gri · Large',
+      badgeBg: 'bg-amber-700',
+      variant: 'Grey · Large',
+      images: glassImages('Prescription Ref.140.01_Aguila'),
+      img: glassImages('Prescription Ref.140.01_Aguila')[0],
+      detailImg: glassImages('Prescription Ref.140.01_Aguila')[0],
+      desc: 'Aguila Large: TR-90 poliamid, ultra dayanıklı endüstriyel tasarım. Ayarlanabilir kaymaz saplar; Small (159.01) ile birlikte 2 beden seçeneği.',
       specs: {
-        standard: 'EN166 1FT K N',
-        prescription: 'Reçeteli Numaralı Lens Entegre',
-        impact: 'FT Yüksek Hızlı Parçacık Direnci',
-        coating: 'Platinum Anti-Fog Technology',
-        weight: '28g'
+        standard: 'EN166 F',
+        prescription: 'Organik / Polikarbonat numaralı lens',
+        impact: 'Mekanik darbe direnci (F)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'TR-90 poliamid',
+        size: 'Large · Kalibre 55',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Platinum buğulanmazlık', 'Ayarlanabilir kaymaz burun pedi', 'Geniş görüş açısı']
+      features: ['TR-90 endüstriyel gövde', 'Ayarlanabilir sap', 'Kaymaz sap pedleri', 'Large beden', '2 beden seçeneği (140.01 / 159.01)']
     },
     {
-      id: 'bolle-klassee',
-      brand: 'Bollé Safety',
-      name: 'Bollé Klassee Numaralı İş Gözlüğü',
-      code: 'BOL-KLASSEE',
-      category: 'bolle',
+      id: '159-01-aguila-small',
+      brand: 'Pegaso',
+      name: 'Aguila 159.01',
+      code: 'REF-159.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Bollé Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/bolle_2.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/bolle_2.jpg',
-      desc: 'Zarif ve dayanıklı çerçeve yapısına sahip Bollé Klassee numaralı iş gözlüğü.',
+      tag: 'Gri · Small',
+      badgeBg: 'bg-amber-700',
+      variant: 'Grey · Small',
+      images: glassImages('Prescription Ref.159.01_Aguila-Small'),
+      img: glassImages('Prescription Ref.159.01_Aguila-Small')[0],
+      detailImg: glassImages('Prescription Ref.159.01_Aguila-Small')[0],
+      desc: 'Aguila Small: TR-90 poliamid endüstriyel tasarımın küçük bedeni. Ayarlanabilir kaymaz saplar; Large (140.01) ile birlikte 2 beden seçeneği.',
       specs: {
-        standard: 'EN166 1F / ANSI Z87.1',
-        prescription: 'Kişiye Özel Optik Cam',
-        impact: 'Mekanik Koruma Sınıfı',
-        coating: 'Çizilmezlik & Antistatik',
-        weight: '26g'
+        standard: 'EN166 F',
+        prescription: 'Organik / Polikarbonat numaralı lens',
+        impact: 'Mekanik darbe direnci (F)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'TR-90 poliamid',
+        size: 'Small · Kalibre 52',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Zarif hafif gövde', 'Yüksek optik netlik', 'Ergonomik sap yapısı']
+      features: ['TR-90 endüstriyel gövde', 'Ayarlanabilir sap', 'Kaymaz sap pedleri', 'Small beden', '2 beden seçeneği (140.01 / 159.01)']
     },
     {
-      id: 'bolle-stks420',
-      brand: 'Bollé Safety',
-      name: 'Bollé STKS 420 Koruyucu Gözlük',
-      code: 'BOL-STKS420',
-      category: 'bolle',
+      id: '119-01-moving',
+      brand: 'Pegaso',
+      name: 'Moving 119.01',
+      code: 'REF-119.01',
+      category: 'impact',
       rxSupport: true,
-      tag: 'Bollé Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/bolle_3.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/bolle_3.jpg',
-      desc: 'Ağır sanayi şartlarında maksimum yan koruma sağlayan STKS 420 modeli.',
+      tag: 'Şeffaf · Spor',
+      badgeBg: 'bg-sky-600',
+      variant: 'Transparent · Tek Beden',
+      images: glassImages('Prescription Ref.119.01_Moving'),
+      img: glassImages('Prescription Ref.119.01_Moving')[0],
+      detailImg: glassImages('Prescription Ref.119.01_Moving')[0],
+      desc: 'Moving: spor tasarımlı TR-90 gövde, panoramik görüş alanı, iç foam ve kaymaz burun pedi. Geniş kalibre 60 ile yüksek görüş konforu.',
       specs: {
-        standard: 'EN166 1FT K N',
-        prescription: 'Rx Numaralı Entegre',
-        impact: 'Ağır Darbe Direnci',
-        coating: 'Platinum Çift Taraflı Kaplama',
-        weight: '30g'
+        standard: 'EN166 F',
+        prescription: 'Polikarbonat numaralı lens',
+        impact: 'Mekanik darbe direnci (F)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'TR-90 poliamid',
+        size: 'Tek beden · Kalibre 60',
+        protection: 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Geniş yan siperlikler', 'Darbelere dayanıklı polikarbonat', 'Yüksek buğu direnci']
+      features: ['TR-90 spor tasarım', 'İç foam conta', 'Kaymaz burun pedi', 'Panoramik geniş görüş', 'Geniş kalibre 60']
     },
     {
-      id: 'bolle-koverrx',
-      brand: 'Bollé Safety',
-      name: 'Bollé Kover RX Numaralı İş Gözlüğü',
-      code: 'BOL-KOVERRX',
-      category: 'bolle',
+      id: '1095-01-duplex',
+      brand: 'Pegaso',
+      name: 'Duplex 1095.01',
+      code: 'REF-1095.01',
+      category: 'welding',
       rxSupport: true,
-      tag: 'Bollé Model',
-      badgeBg: 'bg-[#1e40af]',
-      img: 'https://www.optisafe.com.tr/images/bolle_4.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/bolle_4.jpg',
-      desc: 'Kişisel numaralı gözlüklerin üzerine de takılabilen veya doğrudan reçeteli lens monte edilen Kover RX.',
-      specs: {
-        standard: 'EN166 1F K N',
-        prescription: 'Rx Klips / Doğrudan Lens Uyumlu',
-        impact: 'Mekanik Koruma',
-        coating: 'Platinum K&N Sertifikalı',
-        weight: '33g'
-      },
-      features: ['Over-spec (Gözlük üstü) konsepti', 'Geniş koruma alanı', 'Platinum kaplama']
-    },
-
-    // ---------------------------------------------------------
-    // UVEX PRODUCTS (1 Main Series)
-    // ---------------------------------------------------------
-    {
-      id: 'uvex-main',
-      brand: 'uvex',
-      name: 'uvex Ağır Sanayi Koruyucu Gözlük Serisi',
-      code: 'OPT-UVX-300',
-      category: 'uvex',
-      rxSupport: true,
-      tag: 'Alman Mühendisliği',
-      badgeBg: 'bg-[#f97316]',
-      img: 'https://www.optisafe.com.tr/images/uvex1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/uvex.jpg',
-      desc: 'Yenilikçi kaplama teknolojileri ve üstün koruma sağlayan, Alman mühendisliği ürünü ergonomik güvenlik gözlükleri.',
-      specs: {
-        standard: 'EN166 1F / EN170 UV',
-        prescription: 'Yüksek Diyoptri Uyumlu Kişisel Mercek',
-        impact: 'Yüksek Hızlı Parçacık Direnci',
-        coating: 'Supravision Excellence Çizilmez & Buğulanmaz',
-        weight: '30g'
-      },
-      features: [
-        'Kişiye özel numaralı camlar',
-        'Darbe koruma (EN166 standardı)',
-        'UV400 %100 morötesi filtre',
-        'Hafif ve ergonomik tasarım'
-      ],
-      models: []
-    },
-
-    // ---------------------------------------------------------
-    // TEDEX PRODUCTS & SUB-MODELS (2 Sub-models + 1 Main Series)
-    // ---------------------------------------------------------
-    {
-      id: 'tedex-main',
-      brand: 'Tedex',
-      name: 'Tedex Ekstra Hafif İş Güvenlik Gözlüğü Serisi',
-      code: 'OPT-TDX-SERIES',
-      category: 'tedex',
-      rxSupport: false,
-      tag: 'Ultra Hafif 23g Ana Seri',
-      badgeBg: 'bg-emerald-600',
-      img: 'https://www.optisafe.com.tr/images/tedex1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/tedex.jpg',
-      desc: 'Ekonomik ve güvenilir çözümler sunan, endüstriyel standartlara uygun ultra hafif iş güvenliği gözlükleri.',
-      specs: {
-        standard: 'EN166 1F Sertifikalı',
-        prescription: 'Standart Koruyucu (Plano & Numaralı Uyumlu)',
-        impact: 'Mekanik Darbe Direnci',
-        coating: 'Çizilmezlik Sertifikalı',
-        weight: '23g'
-      },
-      features: [
-        'Dayanıklı polikarbonat lens',
-        'Yan koruma kalkanları',
-        'Hafif gövde yapısı',
-        'EN166 standardına uygunluk',
-        '2 farklı model seçeneği'
-      ],
-      models: [
-        { id: 501, title: 'Forte AF', img: 'https://www.optisafe.com.tr/images/tedex_1.jpg' },
-        { id: 502, title: 'Conte', img: 'https://www.optisafe.com.tr/images/tedex_2.jpeg' }
-      ]
-    },
-    {
-      id: 'tedex-forte-af',
-      brand: 'Tedex',
-      name: 'Tedex Forte AF Koruyucu Gözlük',
-      code: 'TDX-FORTE-AF',
-      category: 'tedex',
-      rxSupport: false,
-      tag: 'Tedex Model',
-      badgeBg: 'bg-emerald-600',
-      img: 'https://www.optisafe.com.tr/images/tedex_1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/tedex_1.jpg',
-      desc: 'Buğulanmaz (Anti-Fog) kaplamalı ultra hafif Tedex Forte AF koruyucu iş gözlüğü.',
-      specs: {
-        standard: 'EN166 1F K N',
-        prescription: 'Plano Koruyucu Lens',
-        impact: '45m/s Mekanik Parçacık Direnci',
-        coating: 'Anti-Fog & Çizilmez',
-        weight: '24g'
-      },
-      features: ['Anti-fog buğulanmaz lens', 'Esnek şakık sapları', 'Ekonomik toplu kullanım']
-    },
-    {
-      id: 'tedex-conte',
-      brand: 'Tedex',
-      name: 'Tedex Conte İş Güvenliği Gözlüğü',
-      code: 'TDX-CONTE',
-      category: 'tedex',
-      rxSupport: false,
-      tag: 'Tedex Model',
-      badgeBg: 'bg-emerald-600',
-      img: 'https://www.optisafe.com.tr/images/tedex_2.jpeg',
-      detailImg: 'https://www.optisafe.com.tr/images/tedex_2.jpeg',
-      desc: 'Geniş siperli tasarımı ile şantiye ve imalat hatları için Tedex Conte modeli.',
-      specs: {
-        standard: 'EN166 1F',
-        prescription: 'Plano Koruyucu Lens',
-        impact: 'Mekanik Sıçrama Direnci',
-        coating: 'Sertleştirilmiş Çizilmez',
-        weight: '25g'
-      },
-      features: ['Polikarbonat monoblok gövde', 'Şeffaf yan siperler', 'Kırılmaz esnek yapı']
-    },
-
-    // ---------------------------------------------------------
-    // KAYNAK GÖZLÜKLERİ & SUB-MODELS (2 Sub-models + 1 Main Series)
-    // ---------------------------------------------------------
-    {
-      id: 'kaynak-main',
-      brand: 'OptiSafe Special',
-      name: 'EN175 Kaynak & Dökümhane Gözlüğü Serisi',
-      code: 'OPT-KAY-SERIES',
-      category: 'kaynak',
-      rxSupport: true,
-      tag: 'IR & UV Filtreli Ana Seri',
+      tag: 'Kaynak · DIN 5',
       badgeBg: 'bg-[#971b2f]',
-      img: 'https://www.optisafe.com.tr/images/kaynak1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/kaynak.jpg',
-      desc: 'Kaynak işlemlerinde kullanıma uygun, yüksek ışık, morötesi ve kızılötesi ışın koruması sağlayan özel gözlük serisi.',
+      variant: 'Black/Green DIN 5 · Tek Beden',
+      images: glassImages('Prescription Ref.1095.01_Duplex'),
+      img: glassImages('Prescription Ref.1095.01_Duplex')[0],
+      detailImg: glassImages('Prescription Ref.1095.01_Duplex')[0],
+      desc: 'Duplex gaz kaynak gözlüğü: açılır (flip-front) vizör, naylon gövde, yan siperlikler. DIN 5 / W5 kaynak filtresi ile daha koyu gölge koruması; numaralı lens uyumlu.',
       specs: {
-        standard: 'EN166 / EN169 / EN175',
-        prescription: 'İç Filtreli / Numaralı Takılabilir',
-        impact: 'Ağır Sıcaklık & Sıçrama Koruması',
-        coating: 'IR Filtreli Isı Dayanımlı Cam',
-        weight: '55g'
+        standard: 'EN ISO 16321 UL1.2 W5 C T 1-M',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'Naylon',
+        size: 'Tek beden · Kalibre 55',
+        protection: 'Gaz kaynağı DIN 5 (W5) · Darbe koruması',
       },
-      features: [
-        'IR/UV radyasyon koruması',
-        'Farklı karartma seviyeleri (Shade 3 / Shade 5)',
-        'Isıya dayanıklı çerçeve',
-        'Numaralı lens opsiyonu',
-        '2 farklı model seçeneği'
-      ],
-      models: [
-        { id: 301, title: '5X7 WELDING', img: 'https://www.optisafe.com.tr/images/5x7_welding.jpg' },
-        { id: 302, title: '5X9 FLIP', img: 'https://www.optisafe.com.tr/images/5x9_flip_welding.jpg' }
-      ]
+      features: ['Açılır flip-front vizör', 'DIN 5 / W5 kaynak filtresi', 'Yan siperlikler', 'Ergonomik saplar', 'Numaralı lens uyumlu', 'ISO 16321 sertifikası']
     },
     {
-      id: 'kaynak-5x7-welding',
-      brand: 'OptiSafe Special',
-      name: '5X7 WELDING Kaynak Gözlüğü',
-      code: 'KAY-5X7-WELD',
-      category: 'kaynak',
+      id: '1095-02-duplex',
+      brand: 'Pegaso',
+      name: 'Duplex 1095.02',
+      code: 'REF-1095.02',
+      category: 'welding',
       rxSupport: true,
-      tag: 'Kaynak Modeli',
+      tag: 'Kaynak · DIN 3',
       badgeBg: 'bg-[#971b2f]',
-      img: 'https://www.optisafe.com.tr/images/5x7_welding.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/5x7_welding.jpg',
-      desc: 'Oksijen kaynak işleri için IR 3 ve IR 5 filtre seçenekli özel 5X7 Welding gözlük modeli.',
+      variant: 'Black/Green DIN 3 · Tek Beden',
+      images: glassImages('Prescription Ref.1095.02_Duplex'),
+      img: glassImages('Prescription Ref.1095.02_Duplex')[0],
+      detailImg: glassImages('Prescription Ref.1095.02_Duplex')[0],
+      desc: 'Duplex gaz kaynak gözlüğü: açılır (flip-front) vizör, naylon gövde, yan siperlikler. DIN 3 / W3 daha açık gölge filtresi; numaralı lens uyumlu.',
       specs: {
-        standard: 'EN166 / EN169 IR 5',
-        prescription: 'Reçeteli Gözlük Üstü / Klips Takılabilir',
-        impact: 'Sıcak Çapak & Işın Direnci',
-        coating: 'Isıya Dayanımlı Çizilmez Filtre',
-        weight: '37g'
+        standard: 'EN ISO 16321 U1.2 W3 C T 1-M',
+        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: 'Yüksek darbe direnci (C T)',
+        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: 'Naylon',
+        size: 'Tek beden · Kalibre 55',
+        protection: 'Gaz kaynağı DIN 3 (W3) · Darbe koruması',
       },
-      features: ['IR 3 / IR 5 filtreli lensler', 'Kıvılcım sıçrama koruması', 'Ergonomik saplar']
+      features: ['Açılır flip-front vizör', 'DIN 3 / W3 kaynak filtresi', 'Yan siperlikler', 'Ergonomik saplar', 'Numaralı lens uyumlu', 'ISO 16321 sertifikası']
     },
-    {
-      id: 'kaynak-5x9-flip',
-      brand: 'OptiSafe Special',
-      name: '5X9 FLIP Açılır Mekanizmalı Kaynak Gözlüğü',
-      code: 'KAY-5X9-FLIP',
-      category: 'kaynak',
-      rxSupport: true,
-      tag: 'Flip-Up Kaynak Modeli',
-      badgeBg: 'bg-[#971b2f]',
-      img: 'https://www.optisafe.com.tr/images/5x9_flip_welding.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/5x9_flip_welding.jpg',
-      desc: 'Açılır kapanır (Flip-Up) IR vizör mekanizması ile çapak alma ve kaynak işlemini tek gözlükte birleştiren model.',
-      specs: {
-        standard: 'EN166 1F / EN169 / EN175',
-        prescription: 'Numaralı İç Lens Takılabilir',
-        impact: 'Ağır Çapak & Radyasyon Koruması',
-        coating: 'IR Filtre & Şeffaf Darbe Lensi',
-        weight: '48g'
-      },
-      features: ['Flip-up açılır vizör kapak', 'Çapak alma + kaynak ikisi bir arada', 'Isıya dirençli polimer gövde']
-    },
-
-    // ---------------------------------------------------------
-    // OPTISAFE FLAGSHIP PRO RX
-    // ---------------------------------------------------------
-    {
-      id: 'optisafe-pro-rx',
-      brand: 'OptiSafe',
-      name: 'OptiSafe Pro RX Numaralı İş Gözlüğü',
-      code: 'OPT-PRO-100',
-      category: 'prescription',
-      rxSupport: true,
-      tag: 'Çok Satan Numaralı',
-      badgeBg: 'bg-blue-600',
-      img: 'https://www.optisafe.com.tr/images/univet1.jpg',
-      detailImg: 'https://www.optisafe.com.tr/images/univet.jpg',
-      desc: 'Numaralı lens takılabilen yüksek mekanik dirençli polikarbonat iş güvenliği gözlüğü. Ergonomik yumuşak şakık pedleri ile 8 saatlik konfor.',
-      specs: {
-        standard: 'EN166 1FT K N / ANSI Z87.1',
-        prescription: 'Rx +6.00 / -6.00 Dpt Tam Uyumlu',
-        impact: 'FT (Yüksek Hızlı Parçacıklar 45m/s)',
-        coating: 'Platinum Anti-Fog & Çizilmezlik',
-        weight: '26g'
-      },
-      features: [
-        'Kişiye özel reçeteli lens yuvası',
-        'Polikarbonat yüksek darbe direnci',
-        'Ayarlanabilir sap boyu ve eğimi',
-        'Yumuşak anti-alerjik burun pedi',
-        'UV400 morötesi koruma filtresi'
-      ],
-      models: []
-    }
   ];
 
   const filteredProducts = selectedCategory === 'all' 
@@ -589,13 +590,30 @@ export default function App() {
       ? products.filter(p => p.rxSupport)
       : products.filter(p => p.category === selectedCategory);
 
-  const handleCatalogSubmit = (e) => {
-    e.preventDefault();
-    setCatalogFormSubmitted(true);
-    setTimeout(() => {
-      setCatalogFormSubmitted(false);
-      setCatalogModalOpen(false);
-    }, 2000);
+  const openCatalogModal = () => {
+    setCatalogError(null);
+    setCatalogFileName(null);
+    setCatalogProgress(0);
+    setCatalogGenerating(false);
+    setCatalogModalOpen(true);
+  };
+
+  const handleDownloadCatalog = async () => {
+    setCatalogGenerating(true);
+    setCatalogError(null);
+    setCatalogProgress(0);
+    setCatalogFileName(null);
+    try {
+      const filename = await generateCatalogPdf(products, {
+        onProgress: (pct) => setCatalogProgress(pct),
+      });
+      setCatalogFileName(filename);
+    } catch (err) {
+      console.error(err);
+      setCatalogError('Katalog oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setCatalogGenerating(false);
+    }
   };
 
   return (
@@ -636,7 +654,7 @@ export default function App() {
           {/* Logo Brand */}
           <a href="#" className="flex items-center hover:opacity-90 transition py-1">
             <img 
-              src="https://www.optisafe.com.tr/images/logo.png" 
+              src="/logo.png" 
               alt="OptiSafe - Profesyonel Güvenlik Gözlükleri" 
               className="h-11 sm:h-12 w-auto object-contain"
             />
@@ -668,11 +686,11 @@ export default function App() {
             </a>
 
             <button 
-              onClick={() => setCatalogModalOpen(true)}
+              onClick={openCatalogModal}
               className="hidden sm:flex bg-[#1e40af] hover:bg-[#1e3a8a] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition items-center space-x-1.5 shadow-md shadow-blue-600/20"
             >
               <Download className="w-4 h-4" />
-              <span>Katalog Talebi</span>
+              <span>Katalog İndir</span>
             </button>
 
             {/* Language Selector */}
@@ -727,106 +745,123 @@ export default function App() {
       </header>
 
       {/* ---------------------------------------------------- */}
-      {/* 2. HERO SECTION WITH NEW CUSTOM EYE-CATCHING SHOWCASE */}
+      {/* 2. HERO SECTION WITH FULL-BLEED BACKGROUND VIDEO */}
       {/* ---------------------------------------------------- */}
-      <section id="hero" className="relative pt-12 pb-20 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden border-b border-slate-800">
+      <section id="hero" className="relative pt-12 pb-20 text-white overflow-hidden border-b border-slate-800 min-h-[560px] md:min-h-[640px] flex items-center">
         
-        {/* Glow ambient effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-orange-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+        {/* Full-bleed background video */}
+        <video
+          src="/video/download.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-slate-950/35"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/30 to-transparent"></div>
 
-        <div className="max-w-[1200px] mx-auto px-4 relative z-10">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            
-            {/* Left Content */}
-            <div className="space-y-6 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full backdrop-blur-md">
-                <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
-                OptiSafe • Geleceğin İş Güvenliği Optiği
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight font-heading">
-                Gözleriniz İçin <br />
-                <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
-                  En Yüksek Koruma
-                </span> & Net Görüş
-              </h1>
-
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl">
-                EN166 sertifikalı kişiye özel numaralı koruyucu iş gözlüklerimiz ile endüstriyel sahalarda <strong className="text-white font-bold">sıfır risk ve kristal netlikte konfor</strong> elde edin.
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
-                <a 
-                  href="#products"
-                  className="bg-[#1e40af] hover:bg-blue-600 text-white font-bold text-sm uppercase px-8 py-3.5 rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30"
-                >
-                  <span>Koleksiyonu İnceleyin</span>
-                  <ChevronRight className="w-4 h-4" />
-                </a>
-                <a 
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm uppercase px-7 py-3.5 rounded-xl transition flex items-center space-x-2 shadow-lg shadow-emerald-600/30"
-                >
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
-                  </svg>
-                  <span>WhatsApp İle Sorun</span>
-                </a>
-              </div>
-
-              {/* Badges Bar */}
-              <div className="pt-6 border-t border-slate-800 grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <span className="block text-2xl font-extrabold text-blue-400">15+ Yıl</span>
-                  <span className="text-xs text-slate-400 font-medium">Sektörel Tecrübe</span>
-                </div>
-                <div>
-                  <span className="block text-2xl font-extrabold text-white">EN166</span>
-                  <span className="text-xs text-slate-400 font-medium">Avrupa Standardı</span>
-                </div>
-                <div>
-                  <span className="block text-2xl font-extrabold text-orange-400">%100</span>
-                  <span className="text-xs text-slate-400 font-medium">Kişiye Özel Optik</span>
-                </div>
-              </div>
+        <div className="max-w-[1200px] mx-auto px-4 relative z-10 w-full">
+          <div className="max-w-2xl space-y-6 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+              OptiSafe • Geleceğin İş Güvenliği Optiği
             </div>
 
-            {/* Right Hero Image Showcase (UPDATED HIGH END UNIQUE HERO IMAGE) */}
-            <div className="flex justify-center">
-              <div className="relative w-full max-w-lg bg-slate-900/90 p-3.5 rounded-3xl border border-slate-700/80 shadow-2xl shadow-blue-900/30 group">
-                
-                <div className="absolute top-6 left-6 bg-[#1e40af]/90 backdrop-blur-md text-white text-[10px] font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-widest z-10 border border-blue-400/30 shadow-lg">
-                  OptiSafe High-Protection RX
-                </div>
-                
-                <div className="absolute top-6 right-6 bg-emerald-500/90 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider z-10 shadow-lg flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> EN166 Approved
-                </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight font-heading">
+              Gözleriniz İçin <br />
+              <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
+                En Yüksek Koruma
+              </span> & Net Görüş
+            </h1>
 
-                <div className="overflow-hidden rounded-2xl relative">
-                  <img 
-                    src="/hero_custom.jpg" 
-                    onError={(e) => { e.target.src = "https://www.optisafe.com.tr/images/hero.jpg"; }}
-                    alt="OptiSafe Özel Tasarım Profesyonel Numaralı Güvenlik Gözlükleri" 
-                    className="w-full h-auto rounded-2xl object-cover transform group-hover:scale-105 transition duration-700 shadow-inner"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-                  
-                  <div className="absolute bottom-4 left-4 right-4 text-left p-3 bg-slate-900/85 backdrop-blur-md rounded-xl border border-slate-700/70">
-                    <p className="text-xs font-bold text-white flex items-center justify-between">
-                      <span>OptiSafe Özel Numaralı Polikarbonat Seri</span>
-                      <span className="text-blue-400 font-mono text-[11px]">OPT-RX-2026</span>
-                    </p>
-                    <p className="text-[10px] text-slate-300 mt-0.5">Çizilmez & Buğulanmaz Çift Taraflı Kaplama • Özel Diyoptri Montajı</p>
-                  </div>
-                </div>
+            <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-xl">
+              EN166 sertifikalı kişiye özel numaralı koruyucu iş gözlüklerimiz ile endüstriyel sahalarda <strong className="text-white font-bold">sıfır risk ve kristal netlikte konfor</strong> elde edin.
+            </p>
 
-              </div>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
+              <a 
+                href="#products"
+                className="bg-[#1e40af] hover:bg-blue-600 text-white font-bold text-sm uppercase px-8 py-3.5 rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30"
+              >
+                <span>Koleksiyonu İnceleyin</span>
+                <ChevronRight className="w-4 h-4" />
+              </a>
+              <a 
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm uppercase px-7 py-3.5 rounded-xl transition flex items-center space-x-2 shadow-lg shadow-emerald-600/30"
+              >
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
+                </svg>
+                <span>WhatsApp İle Sorun</span>
+              </a>
             </div>
 
+            {/* Badges Bar */}
+            <div className="pt-6 border-t border-white/15 grid grid-cols-3 gap-4 text-center">
+              <div>
+                <span className="block text-2xl font-extrabold text-blue-400">15+ Yıl</span>
+                <span className="text-xs text-slate-300 font-medium">Sektörel Tecrübe</span>
+              </div>
+              <div>
+                <span className="block text-2xl font-extrabold text-white">EN166</span>
+                <span className="text-xs text-slate-300 font-medium">Avrupa Standardı</span>
+              </div>
+              <div>
+                <span className="block text-2xl font-extrabold text-orange-400">%100</span>
+                <span className="text-xs text-slate-300 font-medium">Kişiye Özel Optik</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------- */}
+      {/* SHOWCASE — Tema görselleri (sahada kullanım) */}
+      {/* ---------------------------------------------------- */}
+      <section className="relative bg-slate-100 py-14 md:py-20 border-t border-slate-200">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 md:mb-10">
+            <div>
+              <span className="text-[#1e40af] font-bold text-xs uppercase tracking-widest">
+                Sahada kanıtlanmış
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 font-heading leading-tight">
+                Gerçek kullanım. Gerçek koruma.
+              </h2>
+            </div>
+            <p className="text-sm text-slate-500 max-w-sm sm:text-right leading-relaxed">
+              Organik Hermetic ve Compact PRO serileri endüstriyel ortamlar için tasarlandı.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4 md:gap-5">
+            {[
+              { src: '/tema/worker-storm-blue.jpg', label: 'Zorlu saha koşulları', sub: 'Her ortamda net görüş', pos: 'object-[center_35%]' },
+              { src: '/tema/organik-hermetic-158-showcase.jpg', label: 'Organik Hermetic 158', sub: 'Latest TECH performs better', pos: 'object-[center_20%]' },
+              { src: '/tema/compact-pro-207-showcase.jpg', label: 'Compact PRO 207', sub: 'Ergonomi & koruma bir arada', pos: 'object-[center_20%]' },
+            ].map((item) => (
+              <div
+                key={item.src}
+                className="relative group overflow-hidden rounded-2xl aspect-[4/3] md:aspect-[5/4] shadow-lg shadow-slate-900/10 ring-1 ring-slate-900/5"
+              >
+                <img
+                  src={item.src}
+                  alt={item.label}
+                  className={`absolute inset-0 w-full h-full object-cover ${item.pos} transition duration-700 group-hover:scale-105`}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                  <p className="text-white font-black text-lg font-heading leading-snug">{item.label}</p>
+                  <p className="text-slate-300 text-xs mt-1.5">{item.sub}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -843,7 +878,7 @@ export default function App() {
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 mb-3 font-heading">Ürünlerimiz & Modellerimiz</h2>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Univet, Bollé, uvex, Tedex ve Kaynak Gözlüklerinin tüm alt modelleri eksiksiz olarak listelenmiştir. İlgilendiğiniz modelin detaylarını ve teknik sertifikalarını inceleyebilirsiniz.
+              Pegaso numaralı iş güvenliği gözlükleri — darbe, sıvı/toz ve kaynak korumalı modeller. Her modeli üç açıdan inceleyin; teknik özellikleri ve sertifikaları detayda görün.
             </p>
           </div>
 
@@ -851,12 +886,10 @@ export default function App() {
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {[
               { id: 'all', label: `Tüm Ürünler (${products.length})` },
-              { id: 'univet', label: 'Univet (8 Model)' },
-              { id: 'bolle', label: 'Bollé (4 Model)' },
-              { id: 'uvex', label: 'uvex' },
-              { id: 'tedex', label: 'Tedex (2 Model)' },
-              { id: 'kaynak', label: 'Kaynak Gözlükleri (2 Model)' },
-              { id: 'prescription', label: 'Numaralı (Rx) Uyumlu' }
+              { id: 'impact', label: `Darbe Korumalı (${products.filter(p => p.category === 'impact').length})` },
+              { id: 'hermetic', label: `Sıvı & Toz (${products.filter(p => p.category === 'hermetic').length})` },
+              { id: 'welding', label: `Kaynak (${products.filter(p => p.category === 'welding').length})` },
+              { id: 'prescription', label: 'Numaralı (Rx)' }
             ].map(cat => (
               <button
                 key={cat.id}
@@ -877,29 +910,36 @@ export default function App() {
             {filteredProducts.map((p) => (
               <div 
                 key={p.id}
-                className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition duration-300 flex flex-col justify-between group"
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedProduct(p)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedProduct(p);
+                  }
+                }}
+                className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition duration-300 flex flex-col justify-between group cursor-pointer"
               >
                 <div>
                   <div className="relative h-48 bg-slate-100 overflow-hidden flex items-center justify-center p-4 border-b border-slate-100">
-                    <span className={`absolute top-3 left-3 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-full uppercase tracking-wider ${p.badgeBg}`}>
+                    <span className={`absolute top-3 left-3 z-20 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-full uppercase tracking-wider ${p.badgeBg}`}>
                       {p.tag}
                     </span>
-                    <img 
-                      src={p.img} 
-                      alt={p.name} 
-                      className="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-500 cursor-pointer"
-                      onClick={() => setSelectedProduct(p)}
+                    <ProductImageCarousel
+                      images={p.images || [p.img]}
+                      alt={p.name}
+                      imgClassName="max-h-40 max-w-full object-contain group-hover:scale-105 transition duration-500"
                     />
                   </div>
                   
                   <div className="p-5 space-y-2">
-                    <span className="text-[11px] font-bold text-[#1e40af] uppercase tracking-wider block">{p.brand}</span>
-                    <h3 
-                      onClick={() => setSelectedProduct(p)}
-                      className="text-base font-extrabold text-slate-900 group-hover:text-[#1e40af] transition font-heading cursor-pointer leading-snug"
-                    >
+                    <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#1e40af] transition font-heading leading-snug">
                       {p.name}
                     </h3>
+                    {p.variant && (
+                      <span className="text-[10px] font-semibold text-slate-500 block">{p.variant}</span>
+                    )}
                     <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">{p.desc}</p>
                     
                     {p.models && p.models.length > 0 && (
@@ -919,13 +959,10 @@ export default function App() {
 
                 <div className="p-5 pt-0 border-t border-slate-100 mt-3 flex items-center justify-between">
                   <span className="text-[11px] font-bold text-slate-400 font-mono">{p.code}</span>
-                  <button 
-                    onClick={() => setSelectedProduct(p)}
-                    className="bg-slate-100 hover:bg-[#1e40af] hover:text-white text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center space-x-1"
-                  >
+                  <span className="bg-slate-100 group-hover:bg-[#1e40af] group-hover:text-white text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center space-x-1">
                     <span>İncele</span>
                     <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
+                  </span>
                 </div>
               </div>
             ))}
@@ -935,12 +972,96 @@ export default function App() {
       </section>
 
       {/* ---------------------------------------------------- */}
-      {/* 4. BENEFITS SECTION (Core OptiSafe Advantages) */}
+      {/* TEKNİK VİDEO — mar.mp4 */}
       {/* ---------------------------------------------------- */}
-      <section id="benefits" className="py-20 bg-white">
+      <section className="py-16 md:py-20 bg-slate-950 overflow-hidden">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+              <span className="text-blue-400 font-bold text-xs uppercase tracking-widest">
+                Teknik yapı
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-white mt-2 font-heading leading-tight">
+                Parça parça mühendislik
+              </h2>
+            </div>
+            <p className="text-sm text-slate-400 max-w-md sm:text-right leading-relaxed">
+              Esnek sap, yan koruma, tel örgü filtre ve darbeye dayanıklı lens — her bileşen sahada maksimum güvenlik için.
+            </p>
+          </div>
+
+          <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/40 bg-slate-900">
+            <video
+              src="/video/mar.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Güvenlik gözlüğü teknik parça animasyonu"
+              className="w-full h-auto max-h-[520px] object-cover object-center"
+            />
+            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 rounded-3xl" />
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------- */}
+      {/* KIT / AKSESUAR — Tema ürün seti */}
+      {/* ---------------------------------------------------- */}
+      <section className="py-20 bg-white overflow-hidden">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+            <div className="order-2 lg:order-1 space-y-5">
+              <span className="text-[#1e40af] font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                KOMPLE ÇÖZÜM
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 font-heading leading-tight">
+                Gözlük + kılıf + aksesuar — sahaya hazır set
+              </h2>
+              <p className="text-slate-600 text-sm leading-relaxed max-w-lg">
+                Organik Hermetic ve Compact PRO serileri; sert kılıf, mikrofiber torba, elastik bant ve hermetik foam conta seçenekleriyle birlikte sunulur. Koruma kadar taşıma ve hijyen de standarttır.
+              </p>
+              <ul className="space-y-2.5 text-sm text-slate-700">
+                {[
+                  'PEGASO SAFETY sert taşıma kılıfı',
+                  'Mikrofiber eyeprotector torba',
+                  'Ayarlanabilir elastik kafa bandı',
+                  'Hermetik foam conta opsiyonu',
+                ].map((line) => (
+                  <li key={line} className="flex items-center gap-2.5">
+                    <Check className="w-4 h-4 text-[#1e40af] shrink-0" />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="#products"
+                className="inline-flex items-center gap-2 bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase px-6 py-3 rounded-xl transition shadow-md shadow-blue-600/20"
+              >
+                Modelleri İncele
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
+            <div className="order-1 lg:order-2 relative">
+              <div className="absolute -inset-4 bg-gradient-to-br from-blue-100/80 to-slate-100 rounded-[2rem] -z-10" />
+              <img
+                src="/tema/kit-organik-158.jpg"
+                alt="Organik Hermetic 158 set — gözlük, kılıf ve torba"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------- */}
+      {/* 4. BENEFITS SECTION */}
+      {/* ---------------------------------------------------- */}
+      <section id="benefits" className="py-20 bg-slate-50">
         <div className="max-w-[1200px] mx-auto px-4">
           
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="text-[#f97316] font-bold text-xs uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
               NEDEN OPTİSAFE?
             </span>
@@ -950,52 +1071,77 @@ export default function App() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            
-            {/* Benefit 1 */}
-            <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-300 transition text-center flex flex-col items-center group">
-              <div className="w-16 h-16 rounded-2xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300">
-                <ShieldCheck className="w-8 h-8" />
+          <div className="grid lg:grid-cols-12 gap-8 mb-12 items-stretch">
+            <div className="lg:col-span-5 relative overflow-hidden rounded-3xl min-h-[360px]">
+              <img
+                src="/tema/worker-radio.jpg"
+                alt="Endüstriyel sahada numaralı koruyucu gözlük"
+                className="absolute inset-0 w-full h-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <p className="text-white font-black text-xl font-heading">Sahada test edilmiş koruma</p>
+                <p className="text-slate-300 text-xs mt-1">EN166 sertifikalı numaralı güvenlik gözlükleri</p>
               </div>
-              <h3 className="text-lg font-extrabold text-slate-900 mb-3 font-heading">Maksimum Koruma</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                EN166 standardına uygun üretilen gözlüklerimiz, mekanik darbeler, kimyasal sıçramalar ve zararlı ışınlara karşı tam koruma sağlar.
-              </p>
             </div>
-
-            {/* Benefit 2 */}
-            <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-300 transition text-center flex flex-col items-center group">
-              <div className="w-16 h-16 rounded-2xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300">
-                <Eye className="w-8 h-8" />
+            <div className="lg:col-span-7 grid sm:grid-cols-2 gap-4">
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 transition flex flex-col group">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Maksimum Koruma</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  EN166 standardına uygun üretilen gözlüklerimiz, mekanik darbeler, kimyasal sıçramalar ve zararlı ışınlara karşı tam koruma sağlar.
+                </p>
               </div>
-              <h3 className="text-lg font-extrabold text-slate-900 mb-3 font-heading">Net Görüş</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Kişiye özel hazırlanan numaralı mercekler sayesinde görüş netliğinden ödün vermeden güvenliğinizi sağlayın.
-              </p>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-300 transition text-center flex flex-col items-center group">
-              <div className="w-16 h-16 rounded-2xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300">
-                <Award className="w-8 h-8" />
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 transition flex flex-col group">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
+                  <Eye className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Net Görüş</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Kişiye özel hazırlanan numaralı mercekler sayesinde görüş netliğinden ödün vermeden güvenliğinizi sağlayın.
+                </p>
               </div>
-              <h3 className="text-lg font-extrabold text-slate-900 mb-3 font-heading">Ergonomik Tasarım</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Uzun saatler boyunca rahatça kullanılabilen, hafif ve ergonomik tasarımlarla çalışanlarınızın konforunu artırın.
-              </p>
-            </div>
-
-            {/* Benefit 4 */}
-            <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-300 transition text-center flex flex-col items-center group">
-              <div className="w-16 h-16 rounded-2xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300">
-                <UserCheck className="w-8 h-8" />
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 transition flex flex-col group">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
+                  <Award className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Ergonomik Tasarım</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Uzun saatler boyunca rahatça kullanılabilen, hafif ve ergonomik tasarımlarla çalışanlarınızın konforunu artırın.
+                </p>
               </div>
-              <h3 className="text-lg font-extrabold text-slate-900 mb-3 font-heading">Kişiselleştirme</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Her çalışanın göz numarasına özel üretim yaparak kişiselleştirilmiş güvenlik koruma çözümleri sağlıyoruz.
-              </p>
+              <div className="p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 transition flex flex-col group">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
+                  <UserCheck className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Kişiselleştirme</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Her çalışanın göz numarasına özel üretim yaparak kişiselleştirilmiş güvenlik koruma çözümleri sağlıyoruz.
+                </p>
+              </div>
             </div>
+          </div>
 
+          <div className="relative overflow-hidden rounded-3xl min-h-[220px] md:min-h-[280px]">
+            <img
+              src="/tema/worker-closeup.jpg"
+              alt="Yakın plan güvenlik gözlüğü portresi"
+              className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
+            />
+            <div className="absolute inset-0 bg-slate-950/55" />
+            <div className="relative z-10 h-full min-h-[220px] md:min-h-[280px] flex items-center px-6 md:px-12">
+              <div className="max-w-xl">
+                <p className="text-[#93c5fd] font-bold text-xs uppercase tracking-widest mb-2">1956’dan beri koruma teknolojisi</p>
+                <h3 className="text-2xl md:text-3xl font-black text-white font-heading leading-tight">
+                  Latest TECH performs better
+                </h3>
+                <p className="text-slate-200 text-sm mt-3 leading-relaxed">
+                  Pegaso numaralı iş güvenliği gözlükleri — OptiSafe güvencesiyle Türkiye’de.
+                </p>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1006,7 +1152,7 @@ export default function App() {
       {/* ---------------------------------------------------- */}
       <section id="about" className="py-20 bg-slate-900 text-white relative overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-4 relative z-10">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-10 lg:gap-14 items-center">
             
             <div className="space-y-6">
               <span className="text-[#f97316] font-bold text-xs uppercase tracking-widest bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/30">
@@ -1034,24 +1180,34 @@ export default function App() {
                   </ul>
                 </div>
               </div>
+
+              <button 
+                onClick={openCatalogModal}
+                className="bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase px-7 py-3.5 rounded-xl transition shadow-lg"
+              >
+                Kurumsal Kataloğu İndir
+              </button>
             </div>
 
-            <div className="bg-slate-800/90 p-8 rounded-2xl border border-slate-700 space-y-6 shadow-2xl">
-              <h3 className="text-2xl font-black text-white font-heading">Neden OptiSafe?</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Numaralı iş güvenliği gözlüklerinde uzmanlaşmış ekibimiz ve yenilikçi ürünlerimizle, çalışanlarınızın göz sağlığını korumak için en uygun çözümleri sunuyoruz.
-              </p>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Numaralı iş güvenliği gözlüklerimiz hem darbelere karşı tam koruma sağlar hem de kristal netlikte görüş sunar. Bu sayede çalışanlarınız hem güvende kalır hem de performanslarını en üst seviyede tutarlar.
-              </p>
-
-              <div className="pt-2">
-                <button 
-                  onClick={() => setCatalogModalOpen(true)}
-                  className="w-full bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase py-3.5 rounded-xl transition text-center shadow-lg"
-                >
-                  Kurumsal Kataloğu İndir
-                </button>
+            <div className="space-y-4">
+              <div className="relative overflow-hidden rounded-3xl aspect-[4/3]">
+                <img
+                  src="/tema/team.jpg"
+                  alt="OptiSafe / Pegaso güvenlik ekibi"
+                  className="absolute inset-0 w-full h-full object-cover object-left"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="text-white font-bold text-sm">Uzman ekip · Güvenilir çözüm</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative overflow-hidden rounded-2xl aspect-square">
+                  <img src="/tema/tech-qr.jpg" alt="Teknik föy ve QR erişim" className="absolute inset-0 w-full h-full object-cover" />
+                </div>
+                <div className="relative overflow-hidden rounded-2xl aspect-square">
+                  <img src="/tema/logo-pegaso-red.jpg" alt="Pegaso Safety 1956" className="absolute inset-0 w-full h-full object-cover" />
+                </div>
               </div>
             </div>
 
@@ -1088,6 +1244,15 @@ export default function App() {
                   <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                     Yenikent Mah. Gazi Mustafa Kemal Cad. No:46H, 41900 Derince / Kocaeli
                   </p>
+                  <a
+                    href="https://maps.google.com/maps?ll=40.776974,29.81302&z=16&q=Gazi%20Mustafa%20Kemal%20Cd.%20No%3A46H%20Yenikent%2041900%20Derince%2FKocaeli"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1e40af] hover:underline mt-2"
+                  >
+                    Yol tarifi al
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
 
@@ -1130,38 +1295,16 @@ export default function App() {
               </div>
             </div>
 
-            {/* Form */}
-            <div className="lg:col-span-2 bg-slate-50 p-8 rounded-2xl border border-slate-200">
-              <h3 className="text-xl font-bold text-slate-900 mb-6 font-heading">Bize Mesaj Gönderin</h3>
-              <form onSubmit={handleCatalogSubmit} className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Adınız Soyadınız *</label>
-                    <input type="text" required placeholder="Ad Soyad" className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-[#1e40af]" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Firma Adı *</label>
-                    <input type="text" required placeholder="Firma Adı" className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-[#1e40af]" />
-                  </div>
-                </div>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">E-Posta Adresi *</label>
-                    <input type="email" required placeholder="ornek@firma.com" className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-[#1e40af]" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Telefon *</label>
-                    <input type="tel" required placeholder="053X XXX XX XX" className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-[#1e40af]" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Mesajınız / Numune Talebiniz</label>
-                  <textarea rows={4} placeholder="İhtiyacınız olan gözlük adedi ve detaylar..." className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-[#1e40af]"></textarea>
-                </div>
-                <button type="submit" className="bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase px-8 py-3.5 rounded-xl transition shadow-md shadow-blue-600/20">
-                  Mesajı Gönder
-                </button>
-              </form>
+            {/* Map */}
+            <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-100 min-h-[360px] md:min-h-[440px]">
+              <iframe
+                title="OptiSafe konum — Derince / Kocaeli"
+                src="https://maps.google.com/maps?q=40.776974,29.81302&hl=tr&z=16&output=embed"
+                className="w-full h-full min-h-[360px] md:min-h-[440px] border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
             </div>
 
           </div>
@@ -1179,7 +1322,7 @@ export default function App() {
             <div className="space-y-4">
               <a href="#" className="inline-block bg-white p-2.5 rounded-xl shadow-md border border-slate-700 hover:opacity-95 transition">
                 <img 
-                  src="https://www.optisafe.com.tr/images/logo.png" 
+                  src="/logo.png" 
                   alt="OptiSafe Logo" 
                   className="h-10 w-auto object-contain"
                 />
@@ -1192,11 +1335,11 @@ export default function App() {
             <div>
               <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">Markalarımız</h4>
               <ul className="space-y-2 text-xs text-slate-400">
-                <li>Univet Safety (8 Model)</li>
-                <li>Bollé Safety (4 Model)</li>
-                <li>uvex Safety</li>
-                <li>Tedex (2 Model)</li>
-                <li>Kaynak Gözlükleri (2 Model)</li>
+                <li>Pegaso Organik / Hermetic</li>
+                <li>Pegaso Compact PRO</li>
+                <li>Pegaso Brave / Fever / Moving</li>
+                <li>Pegaso Aguila / Europa / Normal</li>
+                <li>Pegaso Duplex Kaynak</li>
               </ul>
             </div>
 
@@ -1231,169 +1374,245 @@ export default function App() {
         </div>
       </footer>
 
-      {/* CATALOG REQUEST MODAL */}
+      {/* CATALOG PDF MODAL */}
       {catalogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 text-slate-900 relative shadow-2xl">
-            <button onClick={() => setCatalogModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+          onClick={() => !catalogGenerating && setCatalogModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 text-slate-900 relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => !catalogGenerating && setCatalogModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 disabled:opacity-40"
+              disabled={catalogGenerating}
+            >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-2xl font-black text-slate-900 mb-1 font-heading">Katalog & Teknik Föy Talebi</h3>
-            <p className="text-xs text-slate-600 mb-4">EN166 sertifika föyleri ve ürün kataloğu için bilgilerinizi doldurun.</p>
-
-            {catalogFormSubmitted ? (
-              <div className="py-8 text-center space-y-2">
-                <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto" />
-                <h4 className="text-lg font-bold">Talebiniz Alındı!</h4>
-                <p className="text-xs text-slate-500">Katalog e-posta adresinize iletilecektir.</p>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-xl bg-blue-50 text-[#1e40af] flex items-center justify-center">
+                <FileText className="w-5 h-5" />
               </div>
-            ) : (
-              <form onSubmit={handleCatalogSubmit} className="space-y-3 text-left">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Ad Soyad *</label>
-                  <input type="text" required className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#1e40af]" />
+              <div>
+                <h3 className="text-xl font-black text-slate-900 font-heading leading-tight">Kurumsal Ürün Kataloğu</h3>
+                <p className="text-xs text-slate-500 mt-0.5">{products.length} model · PDF formatında</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed mb-5">
+              Tüm numaralı iş güvenliği gözlüklerimizi kapak sayfası, içindekiler ve ürün kartlarıyla kurumsal PDF katalog olarak indirin.
+            </p>
+
+            <ul className="space-y-2 mb-5 text-xs text-slate-600">
+              {[
+                'OptiSafe kapak ve iletişim bilgileri',
+                'Model listesi (içindekiler)',
+                'Ürün görselleri, kodlar ve teknik özellikler',
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-[#1e40af] shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            {catalogGenerating && (
+              <div className="mb-4">
+                <div className="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1.5">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1e40af]" />
+                    Katalog hazırlanıyor…
+                  </span>
+                  <span>%{catalogProgress}</span>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Firma Adı *</label>
-                  <input type="text" required className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#1e40af]" />
+                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#1e40af] rounded-full transition-all duration-300"
+                    style={{ width: `${catalogProgress}%` }}
+                  />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Telefon *</label>
-                  <input type="tel" required className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#1e40af]" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">E-Posta *</label>
-                  <input type="email" required className="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#1e40af]" />
-                </div>
-                <button type="submit" className="w-full bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase py-3 rounded-lg transition mt-2 shadow">
-                  Kataloğu E-Posta İle Gönder
-                </button>
-              </form>
+              </div>
             )}
+
+            {catalogFileName && !catalogGenerating && (
+              <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-start gap-2">
+                <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-emerald-800">Katalog indirildi</p>
+                  <p className="text-[11px] text-emerald-700 mt-0.5">{catalogFileName}</p>
+                </div>
+              </div>
+            )}
+
+            {catalogError && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-xs text-red-700">
+                {catalogError}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleDownloadCatalog}
+              disabled={catalogGenerating}
+              className="w-full bg-[#1e40af] hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold text-xs uppercase py-3.5 rounded-xl transition shadow flex items-center justify-center gap-2"
+            >
+              {catalogGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Oluşturuluyor…
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  {catalogFileName ? 'Tekrar İndir' : 'PDF Kataloğu İndir'}
+                </>
+              )}
+            </button>
           </div>
         </div>
       )}
 
-      {/* PRODUCT DETAIL & SUB-MODELS MODAL */}
+      {/* PRODUCT DETAIL MODAL */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 text-slate-900 relative shadow-2xl my-8 max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1">
-              <X className="w-6 h-6" />
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm overflow-y-auto"
+          onClick={() => setSelectedProduct(null)}
+        >
+          <div
+            className="bg-white rounded-3xl max-w-3xl w-full relative shadow-2xl my-6 max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedProduct(null)}
+              className="absolute top-3 right-3 z-30 text-slate-500 hover:text-slate-900 bg-white/90 hover:bg-white p-2 rounded-full shadow border border-slate-200 transition"
+              aria-label="Kapat"
+            >
+              <X className="w-5 h-5" />
             </button>
 
-            {/* Product Overview Header */}
-            <div className="grid sm:grid-cols-2 gap-6 mb-6 items-center">
-              <div className="h-56 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center p-4 border border-slate-200 relative group">
-                <img 
-                  src={selectedProduct.detailImg || selectedProduct.img} 
-                  alt={selectedProduct.name} 
-                  className="max-h-full max-w-full object-contain cursor-pointer group-hover:scale-105 transition"
-                  onClick={() => setEnlargedImage({ title: selectedProduct.name, img: selectedProduct.detailImg || selectedProduct.img })}
+            {/* Gallery */}
+            <div className="relative bg-gradient-to-b from-slate-100 to-slate-50 border-b border-slate-200">
+              <div className="h-64 sm:h-80 flex items-center justify-center p-6 relative">
+                <ProductImageCarousel
+                  key={selectedProduct.id}
+                  images={selectedProduct.images || [selectedProduct.detailImg || selectedProduct.img]}
+                  alt={selectedProduct.name}
+                  onImageClick={(img, idx, imgs) => {
+                    setEnlargedImage({ title: selectedProduct.name, images: imgs, img, initialIndex: idx });
+                  }}
+                  imgClassName="max-h-56 sm:max-h-72 max-w-full object-contain cursor-zoom-in"
                 />
-                <button 
-                  onClick={() => setEnlargedImage({ title: selectedProduct.name, img: selectedProduct.detailImg || selectedProduct.img })}
-                  className="absolute bottom-2 right-2 bg-white/90 p-1.5 rounded-lg shadow text-slate-700 hover:text-[#1e40af] flex items-center gap-1 text-[10px] font-bold"
+                <button
+                  onClick={() => {
+                    const imgs = selectedProduct.images || [selectedProduct.detailImg || selectedProduct.img];
+                    setEnlargedImage({ title: selectedProduct.name, images: imgs, img: imgs[0], initialIndex: 0 });
+                  }}
+                  className="absolute bottom-4 right-4 z-20 bg-white/95 px-3 py-1.5 rounded-full shadow text-slate-700 hover:text-[#1e40af] flex items-center gap-1.5 text-[11px] font-bold border border-slate-200"
                 >
                   <Maximize2 className="w-3.5 h-3.5" /> Büyüt
                 </button>
               </div>
-
-              <div>
-                <span className="text-xs font-bold text-[#1e40af] uppercase tracking-wider block mb-1">
-                  {selectedProduct.brand} • Kod: {selectedProduct.code}
-                </span>
-                <h3 className="text-2xl font-black text-slate-900 mb-2 font-heading leading-tight">{selectedProduct.name}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed mb-4">{selectedProduct.desc}</p>
-                <span className={`inline-block text-[10px] font-bold text-white px-3 py-1 rounded-full uppercase tracking-wider ${selectedProduct.badgeBg}`}>
-                  {selectedProduct.tag}
-                </span>
-              </div>
             </div>
 
-            {/* Features List */}
-            {selectedProduct.features && selectedProduct.features.length > 0 && (
-              <div className="mb-6">
-                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-2 font-heading">Öne Çıkan Özellikler</h4>
-                <ul className="grid sm:grid-cols-2 gap-2 text-xs text-slate-700">
-                  {selectedProduct.features.map((feat, idx) => (
-                    <li key={idx} className="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                      <Check className="w-4 h-4 text-[#1e40af] shrink-0" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Technical Specifications */}
-            {selectedProduct.specs && (
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 space-y-2 text-xs">
-                <h4 className="font-extrabold text-slate-900 uppercase tracking-wider font-heading border-b border-slate-200 pb-1 mb-2">Teknik Özellikler & Sertifikalar</h4>
-                <p><strong>Standart:</strong> {selectedProduct.specs.standard}</p>
-                <p><strong>Numaralı Lens Entegrasyonu:</strong> {selectedProduct.specs.prescription}</p>
-                <p><strong>Darbe Direnci:</strong> {selectedProduct.specs.impact}</p>
-                <p><strong>Kaplama Teknolojisi:</strong> {selectedProduct.specs.coating}</p>
-                <p><strong>Ağırlık:</strong> {selectedProduct.specs.weight}</p>
-              </div>
-            )}
-
-            {/* Models / Sub-Products Grid */}
-            {selectedProduct.models && selectedProduct.models.length > 0 && (
-              <div className="mb-6 pt-4 border-t border-slate-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider font-heading">
-                    {selectedProduct.brand} Model Seçenekleri ({selectedProduct.models.length} Model)
-                  </h4>
-                  <span className="text-[11px] text-slate-500">Büyütmek için tıklayın</span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {selectedProduct.models.map((m) => (
-                    <div 
-                      key={m.id}
-                      onClick={() => setEnlargedImage({ title: `${selectedProduct.brand} ${m.title}`, img: m.img })}
-                      className="bg-slate-50 hover:bg-white border border-slate-200 rounded-xl p-2.5 text-center cursor-pointer hover:shadow-md hover:border-[#1e40af] transition group"
-                    >
-                      <div className="h-24 bg-white rounded-lg overflow-hidden flex items-center justify-center p-2 mb-2 border border-slate-100 relative">
-                        <img 
-                          src={m.img} 
-                          alt={m.title} 
-                          className="max-h-full max-w-full object-contain group-hover:scale-105 transition"
-                        />
-                        <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                          <Maximize2 className="w-4 h-4 text-slate-800 bg-white/80 p-0.5 rounded" />
-                        </div>
-                      </div>
-                      <span className="text-xs font-extrabold text-slate-800 group-hover:text-[#1e40af] transition font-heading block truncate">
-                        {m.title}
+            <div className="p-5 sm:p-7">
+              {/* Header */}
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className={`text-[10px] font-bold text-white px-2.5 py-1 rounded-full uppercase tracking-wider ${selectedProduct.badgeBg}`}>
+                      {selectedProduct.tag}
+                    </span>
+                    {selectedProduct.rxSupport && (
+                      <span className="text-[10px] font-bold text-[#1e40af] bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Rx Numaralı
                       </span>
-                    </div>
-                  ))}
+                    )}
+                  </div>
+                  <p className="text-[11px] font-bold text-[#1e40af] uppercase tracking-wider mb-1">
+                    {selectedProduct.brand} · {selectedProduct.code}
+                  </p>
+                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading leading-tight">
+                    {selectedProduct.name}
+                  </h3>
+                  {selectedProduct.variant && (
+                    <p className="text-sm text-slate-500 font-medium mt-1">{selectedProduct.variant}</p>
+                  )}
                 </div>
               </div>
-            )}
 
-            {/* Modal Bottom Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <a 
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase py-3 rounded-xl transition text-center shadow flex items-center justify-center gap-1.5"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
-                </svg>
-                <span>WhatsApp'tan Teklif Al</span>
-              </a>
-              <button 
-                onClick={() => setSelectedProduct(null)}
-                className="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase px-6 py-3 rounded-xl transition"
-              >
-                Kapat
-              </button>
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                {selectedProduct.desc}
+              </p>
+
+              {/* Specs grid */}
+              {selectedProduct.specs && (
+                <div className="mb-6">
+                  <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3 font-heading flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-[#1e40af]" />
+                    Teknik Özellikler & Sertifikalar
+                  </h4>
+                  <div className="grid sm:grid-cols-2 gap-2.5">
+                    {[
+                      { label: 'Standart', value: selectedProduct.specs.standard },
+                      { label: 'Koruma', value: selectedProduct.specs.protection },
+                      { label: 'Numaralı Lens', value: selectedProduct.specs.prescription },
+                      { label: 'Darbe Direnci', value: selectedProduct.specs.impact },
+                      { label: 'Kaplama', value: selectedProduct.specs.coating },
+                      { label: 'Çerçeve', value: selectedProduct.specs.frame },
+                      { label: 'Beden', value: selectedProduct.specs.size },
+                    ].filter(row => row.value).map((row) => (
+                      <div key={row.label} className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{row.label}</p>
+                        <p className="text-xs font-semibold text-slate-800 leading-snug">{row.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Features */}
+              {selectedProduct.features && selectedProduct.features.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3 font-heading flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#f97316]" />
+                    Öne Çıkan Özellikler
+                  </h4>
+                  <ul className="grid sm:grid-cols-2 gap-2">
+                    {selectedProduct.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-700">
+                        <span className="mt-0.5 w-5 h-5 rounded-full bg-blue-50 text-[#1e40af] flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3" />
+                        </span>
+                        <span className="leading-snug font-medium">{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-1 border-t border-slate-100">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase py-3.5 rounded-xl transition text-center shadow flex items-center justify-center gap-1.5"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
+                  </svg>
+                  <span>WhatsApp'tan Teklif Al</span>
+                </a>
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase px-6 py-3.5 rounded-xl transition"
+                >
+                  Kapat
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1417,12 +1636,22 @@ export default function App() {
               {enlargedImage.title}
             </h3>
 
-            <div className="max-h-[70vh] flex items-center justify-center overflow-hidden p-2">
-              <img 
-                src={enlargedImage.img} 
-                alt={enlargedImage.title} 
-                className="max-h-[65vh] max-w-full object-contain rounded-lg"
-              />
+            <div className="max-h-[70vh] w-full flex items-center justify-center overflow-hidden p-2 min-h-[280px]">
+              {enlargedImage.images && enlargedImage.images.length > 1 ? (
+                <ProductImageCarousel
+                  key={`${enlargedImage.title}-${enlargedImage.initialIndex || 0}`}
+                  images={enlargedImage.images}
+                  alt={enlargedImage.title}
+                  initialIndex={enlargedImage.initialIndex || 0}
+                  imgClassName="max-h-[65vh] max-w-full object-contain rounded-lg"
+                />
+              ) : (
+                <img 
+                  src={enlargedImage.img} 
+                  alt={enlargedImage.title} 
+                  className="max-h-[65vh] max-w-full object-contain rounded-lg"
+                />
+              )}
             </div>
           </div>
         </div>
