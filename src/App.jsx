@@ -22,11 +22,14 @@ import {
 } from 'lucide-react';
 import { generateCatalogPdf } from './generateCatalogPdf';
 
+/** Public asset URL that works with Vite `base` (dev, preview, Live Server under /dist/). */
+const asset = (path) => `${import.meta.env.BASE_URL}${String(path).replace(/^\//, '')}`;
+
 const GLASS_VIEWS = ['FrontalView', 'AngledView', 'InteriorView'];
 
 const glassImages = (base) =>
   GLASS_VIEWS.map(
-    (view) => `/glasses/${encodeURIComponent(`${base}_${view}(300dpi).jpg`)}`
+    (view) => asset(`glasses/${encodeURIComponent(`${base}_${view}(300dpi).jpg`)}`)
   );
 
 function ProductImageCarousel({ images, alt, onImageClick, className = '', imgClassName = '', initialIndex = 0 }) {
@@ -654,7 +657,7 @@ export default function App() {
           {/* Logo Brand */}
           <a href="#" className="flex items-center hover:opacity-90 transition py-1">
             <img 
-              src="/logo.png" 
+              src={asset("logo.png")} 
               alt="OptiSafe - Profesyonel Güvenlik Gözlükleri" 
               className="h-11 sm:h-12 w-auto object-contain"
             />
@@ -751,7 +754,7 @@ export default function App() {
         
         {/* Full-bleed background video */}
         <video
-          src="/video/download.mp4"
+          src={asset("video/download.mp4")}
           autoPlay
           muted
           loop
@@ -842,9 +845,9 @@ export default function App() {
 
           <div className="grid md:grid-cols-3 gap-4 md:gap-5">
             {[
-              { src: '/tema/worker-storm-blue.jpg', label: 'Zorlu saha koşulları', sub: 'Her ortamda net görüş', pos: 'object-[center_35%]' },
-              { src: '/tema/organik-hermetic-158-showcase.jpg', label: 'Organik Hermetic 158', sub: 'Latest TECH performs better', pos: 'object-[center_20%]' },
-              { src: '/tema/compact-pro-207-showcase.jpg', label: 'Compact PRO 207', sub: 'Ergonomi & koruma bir arada', pos: 'object-[center_20%]' },
+              { src: asset("tema/worker-storm-blue.jpg"), label: 'Zorlu saha koşulları', sub: 'Her ortamda net görüş', pos: 'object-[center_35%]' },
+              { src: asset("tema/organik-hermetic-158-showcase.jpg"), label: 'Organik Hermetic 158', sub: 'Latest TECH performs better', pos: 'object-[center_20%]' },
+              { src: asset("tema/compact-pro-207-showcase.jpg"), label: 'Compact PRO 207', sub: 'Ergonomi & koruma bir arada', pos: 'object-[center_20%]' },
             ].map((item) => (
               <div
                 key={item.src}
@@ -992,7 +995,7 @@ export default function App() {
 
           <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/40 bg-slate-900">
             <video
-              src="/video/mar.mp4"
+              src={asset("video/mar.mp4")}
               autoPlay
               muted
               loop
@@ -1046,7 +1049,7 @@ export default function App() {
             <div className="order-1 lg:order-2 relative">
               <div className="absolute -inset-4 bg-gradient-to-br from-blue-100/80 to-slate-100 rounded-[2rem] -z-10" />
               <img
-                src="/tema/kit-organik-158.jpg"
+                src={asset("tema/kit-organik-158.jpg")}
                 alt="Organik Hermetic 158 set — gözlük, kılıf ve torba"
                 className="w-full h-auto object-contain"
               />
@@ -1074,7 +1077,7 @@ export default function App() {
           <div className="grid lg:grid-cols-12 gap-8 mb-12 items-stretch">
             <div className="lg:col-span-5 relative overflow-hidden rounded-3xl min-h-[360px]">
               <img
-                src="/tema/worker-radio.jpg"
+                src={asset("tema/worker-radio.jpg")}
                 alt="Endüstriyel sahada numaralı koruyucu gözlük"
                 className="absolute inset-0 w-full h-full object-cover object-top"
               />
@@ -1126,7 +1129,7 @@ export default function App() {
 
           <div className="relative overflow-hidden rounded-3xl min-h-[220px] md:min-h-[280px]">
             <img
-              src="/tema/worker-closeup.jpg"
+              src={asset("tema/worker-closeup.jpg")}
               alt="Yakın plan güvenlik gözlüğü portresi"
               className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
             />
@@ -1192,7 +1195,7 @@ export default function App() {
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-3xl aspect-[4/3]">
                 <img
-                  src="/tema/team.jpg"
+                  src={asset("tema/team.jpg")}
                   alt="OptiSafe / Pegaso güvenlik ekibi"
                   className="absolute inset-0 w-full h-full object-cover object-left"
                 />
@@ -1203,10 +1206,10 @@ export default function App() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative overflow-hidden rounded-2xl aspect-square">
-                  <img src="/tema/tech-qr.jpg" alt="Teknik föy ve QR erişim" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={asset("tema/tech-qr.jpg")} alt="Teknik föy ve QR erişim" className="absolute inset-0 w-full h-full object-cover" />
                 </div>
                 <div className="relative overflow-hidden rounded-2xl aspect-square">
-                  <img src="/tema/logo-pegaso-red.jpg" alt="Pegaso Safety 1956" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={asset("tema/logo-pegaso-red.jpg")} alt="Pegaso Safety 1956" className="absolute inset-0 w-full h-full object-cover" />
                 </div>
               </div>
             </div>
@@ -1322,7 +1325,7 @@ export default function App() {
             <div className="space-y-4">
               <a href="#" className="inline-block bg-white p-2.5 rounded-xl shadow-md border border-slate-700 hover:opacity-95 transition">
                 <img 
-                  src="/logo.png" 
+                  src={asset("logo.png")} 
                   alt="OptiSafe Logo" 
                   className="h-10 w-auto object-contain"
                 />

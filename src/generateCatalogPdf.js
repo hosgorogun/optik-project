@@ -5,6 +5,8 @@ const SLATE = [15, 23, 42];
 const MUTED = [100, 116, 139];
 const LIGHT = [241, 245, 249];
 
+const asset = (path) => `${import.meta.env.BASE_URL}${String(path).replace(/^\//, '')}`;
+
 async function loadImageData(url) {
   try {
     const res = await fetch(url);
@@ -33,8 +35,8 @@ async function arrayBufferToBase64(buffer) {
 
 async function registerTurkishFonts(doc) {
   const [regular, bold] = await Promise.all([
-    fetch('/fonts/DejaVuSans.ttf').then((r) => r.arrayBuffer()),
-    fetch('/fonts/DejaVuSans-Bold.ttf').then((r) => r.arrayBuffer()),
+    fetch(asset('fonts/DejaVuSans.ttf')).then((r) => r.arrayBuffer()),
+    fetch(asset('fonts/DejaVuSans-Bold.ttf')).then((r) => r.arrayBuffer()),
   ]);
   doc.addFileToVFS('DejaVuSans.ttf', await arrayBufferToBase64(regular));
   doc.addFileToVFS('DejaVuSans-Bold.ttf', await arrayBufferToBase64(bold));
@@ -99,7 +101,7 @@ export async function generateCatalogPdf(products, options = {}) {
   doc.setFillColor(...PRIMARY);
   doc.rect(0, 0, 8, pageH, 'F');
 
-  const logoData = await loadImageData('/logo.png');
+  const logoData = await loadImageData(asset('logo.png'));
   if (logoData) {
     try {
       doc.addImage(logoData, 'PNG', margin + 4, 36, 42, 42);
