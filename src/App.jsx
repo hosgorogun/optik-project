@@ -1408,12 +1408,12 @@ export default function App() {
               </div>
             </div>
 
-            {/* Map */}
-            <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-100 min-h-[360px] md:min-h-[440px]">
+            {/* Map — OpenStreetMap embed (Google iframe often blocked on local/Windows hosts) */}
+            <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-100 min-h-[360px] md:min-h-[440px] relative">
               <iframe
                 title={t("contactMapTitle")}
-                src={`https://maps.google.com/maps?q=40.776974,29.81302&hl=${currentLang === 'EN' ? 'en' : 'tr'}&z=16&output=embed`}
-                className="w-full h-full min-h-[360px] md:min-h-[440px] border-0"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=29.80302%2C40.771974%2C29.82302%2C40.781974&amp;layer=mapnik&amp;marker=40.776974%2C29.81302"
+                className="absolute inset-0 w-full h-full border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
