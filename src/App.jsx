@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Menu, 
   X, 
@@ -18,9 +18,11 @@ import {
   Sparkles,
   Maximize2,
   Loader2,
-  FileText
+  FileText,
+  Leaf
 } from 'lucide-react';
 import { generateCatalogPdf } from './generateCatalogPdf';
+import { createT } from './i18n';
 
 /** Public asset URL that works with Vite `base` (dev, preview, Live Server under /dist/). */
 const asset = (path) => `${import.meta.env.BASE_URL}${String(path).replace(/^\//, '')}`;
@@ -95,7 +97,13 @@ function ProductImageCarousel({ images, alt, onImageClick, className = '', imgCl
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState('TR');
+  const [currentLang, setCurrentLang] = useState(() => {
+    try {
+      return localStorage.getItem('optisafe-lang') === 'EN' ? 'EN' : 'TR';
+    } catch {
+      return 'TR';
+    }
+  });
   const [catalogModalOpen, setCatalogModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [enlargedImage, setEnlargedImage] = useState(null);
@@ -105,8 +113,26 @@ export default function App() {
   const [catalogError, setCatalogError] = useState(null);
   const [catalogFileName, setCatalogFileName] = useState(null);
 
-  // WhatsApp Link Handler
-  const whatsappUrl = "https://wa.me/905395895502?text=Merhaba,%20OptiSafe%20numaralı%20iş%20güvenliği%20gözlükleri%20hakkında%20bilgi%20almak%20istiyorum.";
+  const t = useMemo(() => createT(currentLang), [currentLang]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('optisafe-lang', currentLang);
+    } catch {
+      /* ignore */
+    }
+    document.documentElement.lang = currentLang === 'EN' ? 'en' : 'tr';
+  }, [currentLang]);
+
+  const whatsappUrl = useMemo(() => {
+    const text = encodeURIComponent(t('whatsappMsg'));
+    return `https://wa.me/905395895502?text=${text}`;
+  }, [t]);
+
+  const setLang = (lang) => {
+    setCurrentLang(lang);
+    setLangDropdownOpen(false);
+  };
 
   // OptiSafe All Main Products & Sub-Models Collection (Direct & Complete from optisafe.com.tr)
   const products = [
@@ -133,7 +159,7 @@ export default function App() {
         size: 'Tek beden · Kalibre 56',
         protection: 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
       },
-      features: ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', 'Ayarlanabilir elastik kafa bandı', 'Sap + bant çift bağlantı seçeneği', 'PRIVILEGE çizilmez & buğulanmaz kaplama', 'Mavi ışık filtresi (Bluestop)', 'Organik, polikarbonat veya Trivex numaralı lens']
+      features: ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', t('kitItem3'), 'Sap + bant çift bağlantı seçeneği', 'PRIVILEGE çizilmez & buğulanmaz kaplama', 'Mavi ışık filtresi (Bluestop)', 'Organik, polikarbonat veya Trivex numaralı lens']
     },
     {
       id: '158-08-organik-hermetic',
@@ -613,7 +639,7 @@ export default function App() {
       setCatalogFileName(filename);
     } catch (err) {
       console.error(err);
-      setCatalogError('Katalog oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+      setCatalogError(t('catalogError'));
     } finally {
       setCatalogGenerating(false);
     }
@@ -630,7 +656,7 @@ export default function App() {
           <div className="flex items-center space-x-4">
             <span className="flex items-center gap-1.5 text-white font-medium">
               <ShieldCheck className="w-4 h-4 text-[#1e40af]" />
-              OptiSafe • EN166 Sertifikalı Kişiye Özel Numaralı İş Güvenliği Gözlükleri
+              {t('topBar')}
             </span>
           </div>
           <div className="flex items-center space-x-4 text-[11px]">
@@ -638,7 +664,7 @@ export default function App() {
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                 <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
               </svg>
-              WhatsApp Destek
+              {t('whatsappSupport')}
             </a>
             <a href="tel:+905395895502" className="hover:text-white flex items-center gap-1">
               <Phone className="w-3.5 h-3.5 text-[#1e40af]" /> +90 (539) 589 55 02
@@ -658,18 +684,18 @@ export default function App() {
           <a href="#" className="flex items-center hover:opacity-90 transition py-1">
             <img 
               src={asset("logo.png")} 
-              alt="OptiSafe - Profesyonel Güvenlik Gözlükleri" 
+              alt={t("logoAlt")} 
               className="h-11 sm:h-12 w-auto object-contain"
             />
           </a>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8 text-xs font-bold tracking-wider uppercase">
-            <a href="#hero" className="text-slate-700 hover:text-[#1e40af] transition">Ana Sayfa</a>
-            <a href="#products" className="text-slate-700 hover:text-[#1e40af] transition">Ürünlerimiz</a>
-            <a href="#benefits" className="text-slate-700 hover:text-[#1e40af] transition">Avantajlarımız</a>
-            <a href="#about" className="text-slate-700 hover:text-[#1e40af] transition">Hakkımızda</a>
-            <a href="#contact" className="text-slate-700 hover:text-[#1e40af] transition">İletişim</a>
+            <a href="#hero" className="text-slate-700 hover:text-[#1e40af] transition">{t('navHome')}</a>
+            <a href="#products" className="text-slate-700 hover:text-[#1e40af] transition">{t('navProducts')}</a>
+            <a href="#benefits" className="text-slate-700 hover:text-[#1e40af] transition">{t('navBenefits')}</a>
+            <a href="#about" className="text-slate-700 hover:text-[#1e40af] transition">{t('navAbout')}</a>
+            <a href="#contact" className="text-slate-700 hover:text-[#1e40af] transition">{t('navContact')}</a>
           </nav>
 
           {/* Header Right Actions */}
@@ -685,7 +711,7 @@ export default function App() {
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
               </svg>
-              <span>WhatsApp İletişim</span>
+              <span>{t('whatsappContact')}</span>
             </a>
 
             <button 
@@ -693,7 +719,7 @@ export default function App() {
               className="hidden sm:flex bg-[#1e40af] hover:bg-[#1e3a8a] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition items-center space-x-1.5 shadow-md shadow-blue-600/20"
             >
               <Download className="w-4 h-4" />
-              <span>Katalog İndir</span>
+              <span>{t('downloadCatalog')}</span>
             </button>
 
             {/* Language Selector */}
@@ -711,7 +737,7 @@ export default function App() {
                   {['TR', 'EN'].map((lang) => (
                     <button 
                       key={lang}
-                      onClick={() => { setCurrentLang(lang); setLangDropdownOpen(false); }}
+                      onClick={() => setLang(lang)}
                       className={`w-full text-left px-3 py-1.5 hover:bg-[#1e40af] hover:text-white transition ${currentLang === lang ? 'font-bold text-[#1e40af]' : 'text-slate-700'}`}
                     >
                       {lang}
@@ -734,14 +760,14 @@ export default function App() {
         {/* Mobile Navigation Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-3 uppercase font-semibold text-sm">
-            <a href="#hero" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">Ana Sayfa</a>
-            <a href="#products" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">Ürünlerimiz</a>
-            <a href="#benefits" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">Avantajlarımız</a>
-            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">Hakkımızda</a>
-            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">İletişim</a>
+            <a href="#hero" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navHome')}</a>
+            <a href="#products" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navProducts')}</a>
+            <a href="#benefits" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navBenefits')}</a>
+            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navAbout')}</a>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navContact')}</a>
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block py-2 text-emerald-600 font-bold flex items-center gap-2">
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/></svg>
-              WhatsApp Hızlı Destek
+              {t('whatsappQuick')}
             </a>
           </div>
         )}
@@ -770,18 +796,18 @@ export default function App() {
           <div className="max-w-2xl space-y-6 text-center md:text-left">
             <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full backdrop-blur-md">
               <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
-              OptiSafe • Geleceğin İş Güvenliği Optiği
+              {t('heroBadge')}
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight font-heading">
-              Gözleriniz İçin <br />
+              {t('heroTitle1')} <br />
               <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
-                En Yüksek Koruma
-              </span> & Net Görüş
+                {t('heroTitle2')}
+              </span>{' '}{t('heroTitle3')}
             </h1>
 
             <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-xl">
-              EN166 sertifikalı kişiye özel numaralı koruyucu iş gözlüklerimiz ile endüstriyel sahalarda <strong className="text-white font-bold">sıfır risk ve kristal netlikte konfor</strong> elde edin.
+              {t('heroDescBefore')}<strong className="text-white font-bold">{t('heroDescStrong')}</strong>{t('heroDescAfter')}
             </p>
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
@@ -789,7 +815,7 @@ export default function App() {
                 href="#products"
                 className="bg-[#1e40af] hover:bg-blue-600 text-white font-bold text-sm uppercase px-8 py-3.5 rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30"
               >
-                <span>Koleksiyonu İnceleyin</span>
+                <span>{t('heroCtaCollection')}</span>
                 <ChevronRight className="w-4 h-4" />
               </a>
               <a 
@@ -801,23 +827,23 @@ export default function App() {
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
                 </svg>
-                <span>WhatsApp İle Sorun</span>
+                <span>{t('heroCtaWhatsapp')}</span>
               </a>
             </div>
 
             {/* Badges Bar */}
             <div className="pt-6 border-t border-white/15 grid grid-cols-3 gap-4 text-center">
               <div>
-                <span className="block text-2xl font-extrabold text-blue-400">15+ Yıl</span>
-                <span className="text-xs text-slate-300 font-medium">Sektörel Tecrübe</span>
+                <span className="block text-2xl font-extrabold text-blue-400">{t('heroStatYears')}</span>
+                <span className="text-xs text-slate-300 font-medium">{t('heroStatYearsLabel')}</span>
               </div>
               <div>
                 <span className="block text-2xl font-extrabold text-white">EN166</span>
-                <span className="text-xs text-slate-300 font-medium">Avrupa Standardı</span>
+                <span className="text-xs text-slate-300 font-medium">{t('heroStatEnLabel')}</span>
               </div>
               <div>
-                <span className="block text-2xl font-extrabold text-orange-400">%100</span>
-                <span className="text-xs text-slate-300 font-medium">Kişiye Özel Optik</span>
+                <span className="block text-2xl font-extrabold text-orange-400">{t('heroStatCustom')}</span>
+                <span className="text-xs text-slate-300 font-medium">{t('heroStatCustomLabel')}</span>
               </div>
             </div>
           </div>
@@ -832,22 +858,22 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 md:mb-10">
             <div>
               <span className="text-[#1e40af] font-bold text-xs uppercase tracking-widest">
-                Sahada kanıtlanmış
+                {t('showcaseEyebrow')}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 font-heading leading-tight">
-                Gerçek kullanım. Gerçek koruma.
+                {t('showcaseTitle')}
               </h2>
             </div>
             <p className="text-sm text-slate-500 max-w-sm sm:text-right leading-relaxed">
-              Organik Hermetic ve Compact PRO serileri endüstriyel ortamlar için tasarlandı.
+              {t('showcaseDesc')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4 md:gap-5">
             {[
-              { src: asset("tema/worker-storm-blue.jpg"), label: 'Zorlu saha koşulları', sub: 'Her ortamda net görüş', pos: 'object-[center_35%]' },
-              { src: asset("tema/organik-hermetic-158-showcase.jpg"), label: 'Organik Hermetic 158', sub: 'Latest TECH performs better', pos: 'object-[center_20%]' },
-              { src: asset("tema/compact-pro-207-showcase.jpg"), label: 'Compact PRO 207', sub: 'Ergonomi & koruma bir arada', pos: 'object-[center_20%]' },
+              { src: asset("tema/worker-storm-blue.jpg"), label: t('showcase1Label'), sub: t('showcase1Sub'), pos: 'object-[center_35%]' },
+              { src: asset("tema/organik-hermetic-158-showcase.jpg"), label: t('showcase2Label'), sub: t('showcase2Sub'), pos: 'object-[center_20%]' },
+              { src: asset("tema/compact-pro-207-showcase.jpg"), label: t('showcase3Label'), sub: t('showcase3Sub'), pos: 'object-[center_20%]' },
             ].map((item) => (
               <div
                 key={item.src}
@@ -877,22 +903,22 @@ export default function App() {
           
           <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="text-[#1e40af] font-bold text-xs uppercase tracking-widest bg-blue-100/60 px-3 py-1 rounded-full border border-blue-200">
-              OPTİSAFE TÜM ÜRÜNLER & ALT MODELLER ({filteredProducts.length} Çeşit)
+              {t('productsEyebrow', { count: filteredProducts.length })}
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 mb-3 font-heading">Ürünlerimiz & Modellerimiz</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 mb-3 font-heading">{t('productsTitle')}</h2>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Pegaso numaralı iş güvenliği gözlükleri — darbe, sıvı/toz ve kaynak korumalı modeller. Her modeli üç açıdan inceleyin; teknik özellikleri ve sertifikaları detayda görün.
+              {t('productsDesc')}
             </p>
           </div>
 
           {/* Filter Pills */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {[
-              { id: 'all', label: `Tüm Ürünler (${products.length})` },
-              { id: 'impact', label: `Darbe Korumalı (${products.filter(p => p.category === 'impact').length})` },
-              { id: 'hermetic', label: `Sıvı & Toz (${products.filter(p => p.category === 'hermetic').length})` },
-              { id: 'welding', label: `Kaynak (${products.filter(p => p.category === 'welding').length})` },
-              { id: 'prescription', label: 'Numaralı (Rx)' }
+              { id: 'all', label: t('filterAll', { count: products.length }) },
+              { id: 'impact', label: t('filterImpact', { count: products.filter(p => p.category === 'impact').length }) },
+              { id: 'hermetic', label: t('filterHermetic', { count: products.filter(p => p.category === 'hermetic').length }) },
+              { id: 'welding', label: t('filterWelding', { count: products.filter(p => p.category === 'welding').length }) },
+              { id: 'prescription', label: t('filterRx') }
             ].map(cat => (
               <button
                 key={cat.id}
@@ -947,7 +973,7 @@ export default function App() {
                     
                     {p.models && p.models.length > 0 && (
                       <div className="pt-2">
-                        <span className="text-[10px] font-bold text-slate-500 block mb-1">Alt Modeller:</span>
+                        <span className="text-[10px] font-bold text-slate-500 block mb-1">{t('subModels')}</span>
                         <div className="flex flex-wrap gap-1">
                           {p.models.map(m => (
                             <span key={m.id} className="text-[9px] bg-blue-50 border border-blue-100 text-[#1e40af] px-1.5 py-0.5 rounded font-mono font-bold">
@@ -963,7 +989,7 @@ export default function App() {
                 <div className="p-5 pt-0 border-t border-slate-100 mt-3 flex items-center justify-between">
                   <span className="text-[11px] font-bold text-slate-400 font-mono">{p.code}</span>
                   <span className="bg-slate-100 group-hover:bg-[#1e40af] group-hover:text-white text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center space-x-1">
-                    <span>İncele</span>
+                    <span>{t('inspect')}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
@@ -982,14 +1008,14 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
             <div>
               <span className="text-blue-400 font-bold text-xs uppercase tracking-widest">
-                Teknik yapı
+                {t('techEyebrow')}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-white mt-2 font-heading leading-tight">
-                Parça parça mühendislik
+                {t('techTitle')}
               </h2>
             </div>
             <p className="text-sm text-slate-400 max-w-md sm:text-right leading-relaxed">
-              Esnek sap, yan koruma, tel örgü filtre ve darbeye dayanıklı lens — her bileşen sahada maksimum güvenlik için.
+              {t('techDesc')}
             </p>
           </div>
 
@@ -1001,7 +1027,7 @@ export default function App() {
               loop
               playsInline
               preload="metadata"
-              aria-label="Güvenlik gözlüğü teknik parça animasyonu"
+              aria-label={t("techVideoAria")}
               className="w-full h-auto max-h-[520px] object-cover object-center"
             />
             <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 rounded-3xl" />
@@ -1017,20 +1043,20 @@ export default function App() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             <div className="order-2 lg:order-1 space-y-5">
               <span className="text-[#1e40af] font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                KOMPLE ÇÖZÜM
+                {t('kitEyebrow')}
               </span>
               <h2 className="text-3xl sm:text-4xl font-black text-slate-900 font-heading leading-tight">
-                Gözlük + kılıf + aksesuar — sahaya hazır set
+                {t('kitTitle')}
               </h2>
               <p className="text-slate-600 text-sm leading-relaxed max-w-lg">
-                Organik Hermetic ve Compact PRO serileri; sert kılıf, mikrofiber torba, elastik bant ve hermetik foam conta seçenekleriyle birlikte sunulur. Koruma kadar taşıma ve hijyen de standarttır.
+                {t('kitDesc')}
               </p>
               <ul className="space-y-2.5 text-sm text-slate-700">
                 {[
-                  'PEGASO SAFETY sert taşıma kılıfı',
-                  'Mikrofiber eyeprotector torba',
+                  t('kitItem1'),
+                  t('kitItem2'),
                   'Ayarlanabilir elastik kafa bandı',
-                  'Hermetik foam conta opsiyonu',
+                  t('kitItem4'),
                 ].map((line) => (
                   <li key={line} className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-[#1e40af] shrink-0" />
@@ -1042,7 +1068,7 @@ export default function App() {
                 href="#products"
                 className="inline-flex items-center gap-2 bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase px-6 py-3 rounded-xl transition shadow-md shadow-blue-600/20"
               >
-                Modelleri İncele
+                {t('kitCta')}
                 <ChevronRight className="w-4 h-4" />
               </a>
             </div>
@@ -1050,9 +1076,93 @@ export default function App() {
               <div className="absolute -inset-4 bg-gradient-to-br from-blue-100/80 to-slate-100 rounded-[2rem] -z-10" />
               <img
                 src={asset("tema/kit-organik-158.jpg")}
-                alt="Organik Hermetic 158 set — gözlük, kılıf ve torba"
+                alt={t("kitImgAlt")}
                 className="w-full h-auto object-contain"
               />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------- */}
+      {/* GREENLINE / SÜRDÜRÜLEBİLİRLİK + ISCC */}
+      {/* ---------------------------------------------------- */}
+      <section
+        id="greenline"
+        className="relative py-20 border-y border-emerald-100 bg-white"
+      >
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-10">
+            <div>
+              <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold text-xs uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                <Leaf className="w-3.5 h-3.5" />
+                {t('greenEyebrow')}
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 font-heading leading-tight max-w-xl">
+                {t('greenTitle')}
+              </h2>
+            </div>
+            <p className="text-sm text-slate-600 max-w-md lg:text-right leading-relaxed">
+              {t('greenIntro')}
+            </p>
+          </div>
+
+          <div className="w-full bg-white mb-8">
+            <img
+              src={asset('tema/greenline.png')}
+              alt={t("greenImgAlt")}
+              className="block w-full h-auto"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5 lg:gap-6">
+            <div className="rounded-3xl border border-emerald-100 bg-white p-6 sm:p-7 shadow-lg shadow-emerald-900/5 flex flex-col">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mb-3">
+                {t('greenCarbonLabel')}
+              </p>
+              <p className="text-4xl sm:text-5xl font-black text-emerald-700 font-heading leading-none tabular-nums">
+                {t('greenCarbonPct')}
+              </p>
+              <p className="text-sm font-semibold text-slate-800 mt-2">
+                {t('greenCarbonSub')}
+              </p>
+              <p className="text-sm text-slate-600 mt-4 leading-relaxed">
+                {t('greenCarbonDesc')}
+              </p>
+              <ul className="mt-5 space-y-2.5 text-sm text-slate-700">
+                {[
+                  t('greenItem1'),
+                  t('greenItem2'),
+                  t('greenItem3'),
+                  t('greenItem4'),
+                ].map((line) => (
+                  <li key={line} className="flex items-start gap-2.5">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-7 shadow-md shadow-slate-900/5 flex flex-col justify-center gap-5">
+              <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-center">
+                <img
+                  src={asset('tema/iscc-cert.jpg')}
+                  alt="ISCC — International Sustainability & Carbon Certification"
+                  className="w-full h-auto max-h-[120px] object-contain"
+                />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">
+                  {t('greenCertLabel')}
+                </p>
+                <h3 className="text-lg font-extrabold text-slate-900 font-heading leading-snug">
+                  {t('greenCertTitle')}
+                </h3>
+                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                  {t('greenCertDesc')}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -1066,11 +1176,11 @@ export default function App() {
           
           <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="text-[#f97316] font-bold text-xs uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
-              NEDEN OPTİSAFE?
+              {t('benefitsEyebrow')}
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 mb-3 font-heading">Avantajlarımız</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 mb-3 font-heading">{t('benefitsTitle')}</h2>
             <p className="text-slate-600 text-sm sm:text-base">
-              Uzman ekibimiz, çalışanlarınıza en uygun gözlük ve lens seçiminde destek sunarak, güvenliğinizi ve konforunuzu ön planda tutar.
+              {t('benefitsDesc')}
             </p>
           </div>
 
@@ -1078,13 +1188,13 @@ export default function App() {
             <div className="lg:col-span-5 relative overflow-hidden rounded-3xl min-h-[360px]">
               <img
                 src={asset("tema/worker-radio.jpg")}
-                alt="Endüstriyel sahada numaralı koruyucu gözlük"
+                alt={t("benefitsImgAlt")}
                 className="absolute inset-0 w-full h-full object-cover object-top"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <p className="text-white font-black text-xl font-heading">Sahada test edilmiş koruma</p>
-                <p className="text-slate-300 text-xs mt-1">EN166 sertifikalı numaralı güvenlik gözlükleri</p>
+                <p className="text-white font-black text-xl font-heading">{t('benefitsHeroTitle')}</p>
+                <p className="text-slate-300 text-xs mt-1">{t('benefitsHeroSub')}</p>
               </div>
             </div>
             <div className="lg:col-span-7 grid sm:grid-cols-2 gap-4">
@@ -1092,36 +1202,36 @@ export default function App() {
                 <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Maksimum Koruma</h3>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">{t('benefit1Title')}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  EN166 standardına uygun üretilen gözlüklerimiz, mekanik darbeler, kimyasal sıçramalar ve zararlı ışınlara karşı tam koruma sağlar.
+                  {t('benefit1Desc')}
                 </p>
               </div>
               <div className="p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 transition flex flex-col group">
                 <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
                   <Eye className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Net Görüş</h3>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">{t('benefit2Title')}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Kişiye özel hazırlanan numaralı mercekler sayesinde görüş netliğinden ödün vermeden güvenliğinizi sağlayın.
+                  {t('benefit2Desc')}
                 </p>
               </div>
               <div className="p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 transition flex flex-col group">
                 <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
                   <Award className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Ergonomik Tasarım</h3>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">{t('benefit3Title')}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Uzun saatler boyunca rahatça kullanılabilen, hafif ve ergonomik tasarımlarla çalışanlarınızın konforunu artırın.
+                  {t('benefit3Desc')}
                 </p>
               </div>
               <div className="p-6 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 transition flex flex-col group">
                 <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#1e40af] flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
                   <UserCheck className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">Kişiselleştirme</h3>
+                <h3 className="text-base font-extrabold text-slate-900 mb-2 font-heading">{t('benefit4Title')}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Her çalışanın göz numarasına özel üretim yaparak kişiselleştirilmiş güvenlik koruma çözümleri sağlıyoruz.
+                  {t('benefit4Desc')}
                 </p>
               </div>
             </div>
@@ -1130,18 +1240,18 @@ export default function App() {
           <div className="relative overflow-hidden rounded-3xl min-h-[220px] md:min-h-[280px]">
             <img
               src={asset("tema/worker-closeup.jpg")}
-              alt="Yakın plan güvenlik gözlüğü portresi"
+              alt={t("benefitsCloseupAlt")}
               className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
             />
             <div className="absolute inset-0 bg-slate-950/55" />
             <div className="relative z-10 h-full min-h-[220px] md:min-h-[280px] flex items-center px-6 md:px-12">
               <div className="max-w-xl">
-                <p className="text-[#93c5fd] font-bold text-xs uppercase tracking-widest mb-2">1956’dan beri koruma teknolojisi</p>
+                <p className="text-[#93c5fd] font-bold text-xs uppercase tracking-widest mb-2">{t('benefitsBannerEyebrow')}</p>
                 <h3 className="text-2xl md:text-3xl font-black text-white font-heading leading-tight">
-                  Latest TECH performs better
+                  {t('benefitsBannerTitle')}
                 </h3>
                 <p className="text-slate-200 text-sm mt-3 leading-relaxed">
-                  Pegaso numaralı iş güvenliği gözlükleri — OptiSafe güvencesiyle Türkiye’de.
+                  {t('benefitsBannerDesc')}
                 </p>
               </div>
             </div>
@@ -1159,27 +1269,27 @@ export default function App() {
             
             <div className="space-y-6">
               <span className="text-[#f97316] font-bold text-xs uppercase tracking-widest bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/30">
-                KURUMSAL KİMLİK
+                {t('aboutEyebrow')}
               </span>
               <h2 className="text-3xl sm:text-4xl font-black font-heading leading-tight">
-                OptiSafe Hakkında
+                {t('aboutTitle')}
               </h2>
               <p className="text-slate-300 text-sm leading-relaxed">
-                OptiSafe olarak, 15 yılı aşkın süredir endüstriyel ve laboratuvar ortamlarında göz güvenliği çözümleri sunuyoruz. Amacımız, iş güvenliğinden ödün vermeden ihtiyacınız olan görüş netliğini sağlamaktır.
+                {t('aboutDesc')}
               </p>
               
               <div className="space-y-4 pt-2">
                 <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
-                  <h3 className="text-base font-bold text-white mb-1 font-heading">Vizyonumuz</h3>
-                  <p className="text-xs text-slate-300">Göz sağlığı ve güvenliğinde dünya standartlarını belirleyen, yenilikçi ürünlerle sektöre yön veren marka olmak.</p>
+                  <h3 className="text-base font-bold text-white mb-1 font-heading">{t('aboutVisionTitle')}</h3>
+                  <p className="text-xs text-slate-300">{t('aboutVisionDesc')}</p>
                 </div>
 
                 <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
-                  <h3 className="text-base font-bold text-white mb-2 font-heading">Değerlerimiz</h3>
+                  <h3 className="text-base font-bold text-white mb-2 font-heading">{t('aboutValuesTitle')}</h3>
                   <ul className="space-y-1.5 text-xs text-slate-300">
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#1e40af]" /> Kaliteden ve standartlardan ödün vermemek</li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#1e40af]" /> Müşteri ve çalışan memnuniyetini ön planda tutmak</li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#1e40af]" /> Sürekli yenilik ve teknik gelişimi desteklemek</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#1e40af]" /> {t('aboutValue1')}</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#1e40af]" /> {t('aboutValue2')}</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#1e40af]" /> {t('aboutValue3')}</li>
                   </ul>
                 </div>
               </div>
@@ -1188,7 +1298,7 @@ export default function App() {
                 onClick={openCatalogModal}
                 className="bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase px-7 py-3.5 rounded-xl transition shadow-lg"
               >
-                Kurumsal Kataloğu İndir
+                {t('aboutCatalogCta')}
               </button>
             </div>
 
@@ -1196,20 +1306,20 @@ export default function App() {
               <div className="relative overflow-hidden rounded-3xl aspect-[4/3]">
                 <img
                   src={asset("tema/team.jpg")}
-                  alt="OptiSafe / Pegaso güvenlik ekibi"
+                  alt={t("aboutTeamAlt")}
                   className="absolute inset-0 w-full h-full object-cover object-left"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-white font-bold text-sm">Uzman ekip · Güvenilir çözüm</p>
+                  <p className="text-white font-bold text-sm">{t('aboutTeamCaption')}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative overflow-hidden rounded-2xl aspect-square">
-                  <img src={asset("tema/tech-qr.jpg")} alt="Teknik föy ve QR erişim" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={asset("tema/tech-qr.jpg")} alt={t("aboutTechAlt")} className="absolute inset-0 w-full h-full object-cover" />
                 </div>
                 <div className="relative overflow-hidden rounded-2xl aspect-square">
-                  <img src={asset("tema/logo-pegaso-red.jpg")} alt="Pegaso Safety 1956" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={asset("tema/logo-pegaso-red.jpg")} alt={t("aboutLogoAlt")} className="absolute inset-0 w-full h-full object-cover" />
                 </div>
               </div>
             </div>
@@ -1226,11 +1336,11 @@ export default function App() {
           
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-[#1e40af] font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-              İLETİŞİME GEÇİN
+              {t('contactEyebrow')}
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 mb-3 font-heading">İletişim</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3 mb-3 font-heading">{t('contactTitle')}</h2>
             <p className="text-slate-600 text-sm sm:text-base">
-              Ürünlerimiz ve kurumsal teklif talepleriniz için bizimle iletişime geçin.
+              {t('contactDesc')}
             </p>
           </div>
 
@@ -1243,7 +1353,7 @@ export default function App() {
                   <MapPin className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 font-heading">Adres</h4>
+                  <h4 className="text-sm font-bold text-slate-900 font-heading">{t('contactAddress')}</h4>
                   <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                     Yenikent Mah. Gazi Mustafa Kemal Cad. No:46H, 41900 Derince / Kocaeli
                   </p>
@@ -1253,7 +1363,7 @@ export default function App() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1e40af] hover:underline mt-2"
                   >
-                    Yol tarifi al
+                    {t('contactDirections')}
                     <ChevronRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
@@ -1266,9 +1376,9 @@ export default function App() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 font-heading">WhatsApp Hatı</h4>
+                  <h4 className="text-sm font-bold text-slate-900 font-heading">{t('contactWhatsapp')}</h4>
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 hover:text-emerald-700 font-bold mt-1 block">
-                    +90 (539) 589 55 02 (Anında Yanıt)
+                    {t('contactWhatsappReply')}
                   </a>
                 </div>
               </div>
@@ -1278,7 +1388,7 @@ export default function App() {
                   <Phone className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 font-heading">Telefon</h4>
+                  <h4 className="text-sm font-bold text-slate-900 font-heading">{t('contactPhone')}</h4>
                   <a href="tel:+905395895502" className="text-xs text-slate-800 hover:text-[#1e40af] font-semibold mt-1 block">
                     +90 (539) 589 55 02
                   </a>
@@ -1290,7 +1400,7 @@ export default function App() {
                   <Mail className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 font-heading">E-posta</h4>
+                  <h4 className="text-sm font-bold text-slate-900 font-heading">{t('contactEmail')}</h4>
                   <a href="mailto:info@optisafe.com.tr" className="text-xs text-slate-800 hover:text-[#1e40af] font-semibold mt-1 block">
                     info@optisafe.com.tr
                   </a>
@@ -1301,8 +1411,8 @@ export default function App() {
             {/* Map */}
             <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-100 min-h-[360px] md:min-h-[440px]">
               <iframe
-                title="OptiSafe konum — Derince / Kocaeli"
-                src="https://maps.google.com/maps?q=40.776974,29.81302&hl=tr&z=16&output=embed"
+                title={t("contactMapTitle")}
+                src={`https://maps.google.com/maps?q=40.776974,29.81302&hl=${currentLang === 'EN' ? 'en' : 'tr'}&z=16&output=embed`}
                 className="w-full h-full min-h-[360px] md:min-h-[440px] border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -1331,12 +1441,12 @@ export default function App() {
                 />
               </a>
               <p className="text-xs text-slate-400 leading-relaxed">
-                OptiSafe • EN166 sertifikalı kişiye özel numaralı iş güvenliği gözlükleri ve endüstriyel göz koruma çözümleri.
+                {t('footerDesc')}
               </p>
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">Markalarımız</h4>
+              <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">{t('footerBrands')}</h4>
               <ul className="space-y-2 text-xs text-slate-400">
                 <li>Pegaso Organik / Hermetic</li>
                 <li>Pegaso Compact PRO</li>
@@ -1347,14 +1457,14 @@ export default function App() {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">İletişim</h4>
+              <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">{t('footerContact')}</h4>
               <p className="text-xs text-slate-400">Yenikent Mah. GMK Cad. No:46H Derince / Kocaeli</p>
               <p className="text-xs text-slate-400 mt-1">Tel: +90 (539) 589 55 02</p>
               <p className="text-xs text-slate-400">E-posta: info@optisafe.com.tr</p>
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">Sosyal Medya</h4>
+              <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">{t('footerSocial')}</h4>
               <div className="flex space-x-3">
                 <a href="https://www.instagram.com/optisafetr" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-slate-800 rounded-full hover:bg-[#1e40af] transition text-white" aria-label="Instagram">
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -1367,10 +1477,10 @@ export default function App() {
           </div>
 
           <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
-            <p>© 2026 OptiSafe - Tüm Hakları Saklıdır. Profesyonel Güvenlik Gözlükleri.</p>
+            <p>{t('footerRights')}</p>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-slate-300">Gizlilik Politikası</a>
-              <a href="#" className="hover:text-slate-300">KVKK Aydınlatma Metni</a>
+              <a href="#" className="hover:text-slate-300">{t('footerPrivacy')}</a>
+              <a href="#" className="hover:text-slate-300">{t('footerKvkk')}</a>
             </div>
           </div>
 
@@ -1400,20 +1510,20 @@ export default function App() {
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-slate-900 font-heading leading-tight">Kurumsal Ürün Kataloğu</h3>
-                <p className="text-xs text-slate-500 mt-0.5">{products.length} model · PDF formatında</p>
+                <h3 className="text-xl font-black text-slate-900 font-heading leading-tight">{t('catalogTitle')}</h3>
+                <p className="text-xs text-slate-500 mt-0.5">{t('catalogModels', { count: products.length })}</p>
               </div>
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed mb-5">
-              Tüm numaralı iş güvenliği gözlüklerimizi kapak sayfası, içindekiler ve ürün kartlarıyla kurumsal PDF katalog olarak indirin.
+              {t('catalogDesc')}
             </p>
 
             <ul className="space-y-2 mb-5 text-xs text-slate-600">
               {[
-                'OptiSafe kapak ve iletişim bilgileri',
-                'Model listesi (içindekiler)',
-                'Ürün görselleri, kodlar ve teknik özellikler',
+                t('catalogItem1'),
+                t('catalogItem2'),
+                t('catalogItem3'),
               ].map((item) => (
                 <li key={item} className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-[#1e40af] shrink-0" />
@@ -1427,7 +1537,7 @@ export default function App() {
                 <div className="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1.5">
                   <span className="inline-flex items-center gap-1.5">
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1e40af]" />
-                    Katalog hazırlanıyor…
+                    {t('catalogPreparing')}
                   </span>
                   <span>%{catalogProgress}</span>
                 </div>
@@ -1444,7 +1554,7 @@ export default function App() {
               <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-start gap-2">
                 <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-bold text-emerald-800">Katalog indirildi</p>
+                  <p className="text-xs font-bold text-emerald-800">{t('catalogDownloaded')}</p>
                   <p className="text-[11px] text-emerald-700 mt-0.5">{catalogFileName}</p>
                 </div>
               </div>
@@ -1465,12 +1575,12 @@ export default function App() {
               {catalogGenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Oluşturuluyor…
+                  {t('catalogCreating')}
                 </>
               ) : (
                 <>
                   <Download className="w-4 h-4" />
-                  {catalogFileName ? 'Tekrar İndir' : 'PDF Kataloğu İndir'}
+                  {catalogFileName ? t('catalogDownloadAgain') : t('catalogDownloadPdf')}
                 </>
               )}
             </button>
@@ -1491,7 +1601,7 @@ export default function App() {
             <button
               onClick={() => setSelectedProduct(null)}
               className="absolute top-3 right-3 z-30 text-slate-500 hover:text-slate-900 bg-white/90 hover:bg-white p-2 rounded-full shadow border border-slate-200 transition"
-              aria-label="Kapat"
+              aria-label={t("close")}
             >
               <X className="w-5 h-5" />
             </button>
@@ -1515,7 +1625,7 @@ export default function App() {
                   }}
                   className="absolute bottom-4 right-4 z-20 bg-white/95 px-3 py-1.5 rounded-full shadow text-slate-700 hover:text-[#1e40af] flex items-center gap-1.5 text-[11px] font-bold border border-slate-200"
                 >
-                  <Maximize2 className="w-3.5 h-3.5" /> Büyüt
+                  <Maximize2 className="w-3.5 h-3.5" /> {t('enlarge')}
                 </button>
               </div>
             </div>
@@ -1530,7 +1640,7 @@ export default function App() {
                     </span>
                     {selectedProduct.rxSupport && (
                       <span className="text-[10px] font-bold text-[#1e40af] bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Rx Numaralı
+                        {t('rxBadge')}
                       </span>
                     )}
                   </div>
@@ -1555,17 +1665,17 @@ export default function App() {
                 <div className="mb-6">
                   <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3 font-heading flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-[#1e40af]" />
-                    Teknik Özellikler & Sertifikalar
+                    {t('specsTitle')}
                   </h4>
                   <div className="grid sm:grid-cols-2 gap-2.5">
                     {[
-                      { label: 'Standart', value: selectedProduct.specs.standard },
-                      { label: 'Koruma', value: selectedProduct.specs.protection },
-                      { label: 'Numaralı Lens', value: selectedProduct.specs.prescription },
-                      { label: 'Darbe Direnci', value: selectedProduct.specs.impact },
-                      { label: 'Kaplama', value: selectedProduct.specs.coating },
-                      { label: 'Çerçeve', value: selectedProduct.specs.frame },
-                      { label: 'Beden', value: selectedProduct.specs.size },
+                      { label: t('specStandard'), value: selectedProduct.specs.standard },
+                      { label: t('specProtection'), value: selectedProduct.specs.protection },
+                      { label: t('specPrescription'), value: selectedProduct.specs.prescription },
+                      { label: t('specImpact'), value: selectedProduct.specs.impact },
+                      { label: t('specCoating'), value: selectedProduct.specs.coating },
+                      { label: t('specFrame'), value: selectedProduct.specs.frame },
+                      { label: t('specSize'), value: selectedProduct.specs.size },
                     ].filter(row => row.value).map((row) => (
                       <div key={row.label} className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3">
                         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{row.label}</p>
@@ -1581,7 +1691,7 @@ export default function App() {
                 <div className="mb-6">
                   <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3 font-heading flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#f97316]" />
-                    Öne Çıkan Özellikler
+                    {t('featuresTitle')}
                   </h4>
                   <ul className="grid sm:grid-cols-2 gap-2">
                     {selectedProduct.features.map((feat, idx) => (
@@ -1607,13 +1717,13 @@ export default function App() {
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
                   </svg>
-                  <span>WhatsApp'tan Teklif Al</span>
+                  <span>{t('quoteWhatsapp')}</span>
                 </a>
                 <button
                   onClick={() => setSelectedProduct(null)}
                   className="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase px-6 py-3.5 rounded-xl transition"
                 >
-                  Kapat
+                  {t('close')}
                 </button>
               </div>
             </div>
@@ -1667,7 +1777,7 @@ export default function App() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="WhatsApp İletişim"
+        aria-label={t('whatsappContact')}
         className="fixed bottom-6 right-6 z-50 group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl shadow-emerald-500/50 transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-white/20"
       >
         <span className="relative flex h-3 w-3 -mr-1">
@@ -1678,7 +1788,7 @@ export default function App() {
           <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
         </svg>
         <span className="hidden sm:inline-block font-extrabold text-xs tracking-wider uppercase">
-          WhatsApp Destek
+          {t('whatsappSupport')}
         </span>
       </a>
 
