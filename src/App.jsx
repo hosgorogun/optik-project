@@ -941,20 +941,6 @@ export default function App() {
       {/* ---------------------------------------------------- */}
       <section className="py-16 md:py-20 bg-slate-950 overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-            <div>
-              <span className="text-blue-400 font-bold text-xs uppercase tracking-widest">
-                {t('techEyebrow')}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white mt-2 font-heading leading-tight">
-                {t('techTitle')}
-              </h2>
-            </div>
-            <p className="text-sm text-slate-400 max-w-md sm:text-right leading-relaxed">
-              {t('techDesc')}
-            </p>
-          </div>
-
           <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/40 bg-slate-900">
             <video
               src={asset("video/download.mp4")}
@@ -1331,12 +1317,11 @@ export default function App() {
               </div>
             </div>
 
-            {/* Map — OpenStreetMap embed (Google iframe often blocked on local/Windows hosts) */}
-            {/* Map — Google Maps hybrid (satellite + labels) */}
+            {/* Map — Google Maps road view with marker */}
             <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-100 min-h-[360px] md:min-h-[440px] relative">
               <iframe
                 title={t("contactMapTitle")}
-                src={`https://maps.google.com/maps?q=40.776974,29.81302&t=h&z=17&hl=${currentLang === 'EN' ? 'en' : 'tr'}&output=embed`}
+                src={`https://maps.google.com/maps?q=40.776974,29.81302&t=m&z=16&hl=${currentLang === 'EN' ? 'en' : 'tr'}&output=embed`}
                 className="absolute inset-0 w-full h-full border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
