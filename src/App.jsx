@@ -17,11 +17,8 @@ import {
   Check,
   Sparkles,
   Maximize2,
-  Loader2,
-  FileText,
   Leaf
 } from 'lucide-react';
-import { generateCatalogPdf } from './generateCatalogPdf';
 import { createT } from './i18n';
 
 /** Public asset URL that works with Vite `base` (dev, preview, Live Server under /dist/). */
@@ -104,14 +101,9 @@ export default function App() {
       return 'TR';
     }
   });
-  const [catalogModalOpen, setCatalogModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [enlargedImage, setEnlargedImage] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [catalogGenerating, setCatalogGenerating] = useState(false);
-  const [catalogProgress, setCatalogProgress] = useState(0);
-  const [catalogError, setCatalogError] = useState(null);
-  const [catalogFileName, setCatalogFileName] = useState(null);
 
   const t = useMemo(() => createT(currentLang), [currentLang]);
 
@@ -619,63 +611,21 @@ export default function App() {
       ? products.filter(p => p.rxSupport)
       : products.filter(p => p.category === selectedCategory);
 
-  const openCatalogModal = () => {
-    setCatalogError(null);
-    setCatalogFileName(null);
-    setCatalogProgress(0);
-    setCatalogGenerating(false);
-    setCatalogModalOpen(true);
-  };
-
-  const handleDownloadCatalog = async () => {
-    setCatalogGenerating(true);
-    setCatalogError(null);
-    setCatalogProgress(0);
-    setCatalogFileName(null);
-    try {
-      const filename = await generateCatalogPdf(products, {
-        onProgress: (pct) => setCatalogProgress(pct),
-      });
-      setCatalogFileName(filename);
-    } catch (err) {
-      console.error(err);
-      setCatalogError(t('catalogError'));
-    } finally {
-      setCatalogGenerating(false);
-    }
+  const downloadCatalog = () => {
+    const link = document.createElement('a');
+    link.href = asset('pdf/optik.pdf');
+    link.download = 'OptiSafe-Katalog.pdf';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-[#1e40af] selection:text-white relative">
       
       {/* ---------------------------------------------------- */}
-      {/* 1. TOP ANNOUNCEMENT BAR & NAVIGATION */}
+      {/* 1. NAVIGATION */}
       {/* ---------------------------------------------------- */}
-      <div className="bg-slate-950 border-b border-slate-800 text-slate-300 text-xs py-2 px-4">
-        <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center gap-1.5 text-white font-medium">
-              <ShieldCheck className="w-4 h-4 text-[#1e40af]" />
-              {t('topBar')}
-            </span>
-          </div>
-          <div className="flex items-center space-x-4 text-[11px]">
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 font-semibold flex items-center gap-1 text-emerald-400">
-              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
-              </svg>
-              {t('whatsappSupport')}
-            </a>
-            <a href="tel:+905395895502" className="hover:text-white flex items-center gap-1">
-              <Phone className="w-3.5 h-3.5 text-[#1e40af]" /> +90 (539) 589 55 02
-            </a>
-            <a href="mailto:info@optisafe.com.tr" className="hover:text-white hidden md:flex items-center gap-1">
-              <Mail className="w-3.5 h-3.5 text-[#1e40af]" /> info@optisafe.com.tr
-            </a>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navbar */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="max-w-[1200px] mx-auto px-4 h-[75px] flex items-center justify-between">
@@ -715,7 +665,7 @@ export default function App() {
             </a>
 
             <button 
-              onClick={openCatalogModal}
+              onClick={downloadCatalog}
               className="hidden sm:flex bg-[#1e40af] hover:bg-[#1e3a8a] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg transition items-center space-x-1.5 shadow-md shadow-blue-600/20"
             >
               <Download className="w-4 h-4" />
@@ -794,16 +744,13 @@ export default function App() {
 
         <div className="max-w-[1200px] mx-auto px-4 relative z-10 w-full">
           <div className="max-w-2xl space-y-6 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full backdrop-blur-md">
-              <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/30 text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-white animate-pulse" />
               {t('heroBadge')}
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight font-heading">
-              {t('heroTitle1')} <br />
-              <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
-                {t('heroTitle2')}
-              </span>{' '}{t('heroTitle3')}
+              {t('heroTitle')}
             </h1>
 
             <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-xl">
@@ -818,32 +765,21 @@ export default function App() {
                 <span>{t('heroCtaCollection')}</span>
                 <ChevronRight className="w-4 h-4" />
               </a>
-              <a 
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm uppercase px-7 py-3.5 rounded-xl transition flex items-center space-x-2 shadow-lg shadow-emerald-600/30"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
-                </svg>
-                <span>{t('heroCtaWhatsapp')}</span>
-              </a>
             </div>
 
             {/* Badges Bar */}
             <div className="pt-6 border-t border-white/15 grid grid-cols-3 gap-4 text-center">
               <div>
-                <span className="block text-2xl font-extrabold text-blue-400">{t('heroStatYears')}</span>
-                <span className="text-xs text-slate-300 font-medium">{t('heroStatYearsLabel')}</span>
+                <span className="block text-xl sm:text-2xl font-extrabold text-white leading-tight">{t('heroStat1')}</span>
+                <span className="text-xs text-white/80 font-medium">{t('heroStat1Label')}</span>
               </div>
               <div>
-                <span className="block text-2xl font-extrabold text-white">EN166</span>
-                <span className="text-xs text-slate-300 font-medium">{t('heroStatEnLabel')}</span>
+                <span className="block text-xl sm:text-2xl font-extrabold text-white leading-tight">{t('heroStat2')}</span>
+                <span className="text-xs text-white/80 font-medium">{t('heroStat2Label')}</span>
               </div>
               <div>
-                <span className="block text-2xl font-extrabold text-orange-400">{t('heroStatCustom')}</span>
-                <span className="text-xs text-slate-300 font-medium">{t('heroStatCustomLabel')}</span>
+                <span className="block text-xl sm:text-2xl font-extrabold text-white leading-tight">{t('heroStat3')}</span>
+                <span className="text-xs text-white/80 font-medium">{t('heroStat3Label')}</span>
               </div>
             </div>
           </div>
@@ -1001,7 +937,7 @@ export default function App() {
       </section>
 
       {/* ---------------------------------------------------- */}
-      {/* TEKNİK VİDEO — mar.mp4 */}
+      {/* TEKNİK VİDEO — download.mp4 */}
       {/* ---------------------------------------------------- */}
       <section className="py-16 md:py-20 bg-slate-950 overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-4">
@@ -1021,7 +957,7 @@ export default function App() {
 
           <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/40 bg-slate-900">
             <video
-              src={asset("video/mar.mp4")}
+              src={asset("video/download.mp4")}
               autoPlay
               muted
               loop
@@ -1295,32 +1231,19 @@ export default function App() {
               </div>
 
               <button 
-                onClick={openCatalogModal}
+                onClick={downloadCatalog}
                 className="bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase px-7 py-3.5 rounded-xl transition shadow-lg"
               >
                 {t('aboutCatalogCta')}
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-3xl aspect-[4/3]">
-                <img
-                  src={asset("tema/team.jpg")}
-                  alt={t("aboutTeamAlt")}
-                  className="absolute inset-0 w-full h-full object-cover object-left"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-white font-bold text-sm">{t('aboutTeamCaption')}</p>
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative overflow-hidden rounded-2xl aspect-square">
+                <img src={asset("tema/tech-qr.jpg")} alt={t("aboutTechAlt")} className="absolute inset-0 w-full h-full object-cover" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="relative overflow-hidden rounded-2xl aspect-square">
-                  <img src={asset("tema/tech-qr.jpg")} alt={t("aboutTechAlt")} className="absolute inset-0 w-full h-full object-cover" />
-                </div>
-                <div className="relative overflow-hidden rounded-2xl aspect-square">
-                  <img src={asset("tema/logo-pegaso-red.jpg")} alt={t("aboutLogoAlt")} className="absolute inset-0 w-full h-full object-cover" />
-                </div>
+              <div className="relative overflow-hidden rounded-2xl aspect-square">
+                <img src={asset("tema/logo-pegaso-red.jpg")} alt={t("aboutLogoAlt")} className="absolute inset-0 w-full h-full object-cover" />
               </div>
             </div>
 
@@ -1409,10 +1332,11 @@ export default function App() {
             </div>
 
             {/* Map — OpenStreetMap embed (Google iframe often blocked on local/Windows hosts) */}
+            {/* Map — Google Maps hybrid (satellite + labels) */}
             <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-100 min-h-[360px] md:min-h-[440px] relative">
               <iframe
                 title={t("contactMapTitle")}
-                src="https://www.openstreetmap.org/export/embed.html?bbox=29.80302%2C40.771974%2C29.82302%2C40.781974&amp;layer=mapnik&amp;marker=40.776974%2C29.81302"
+                src={`https://maps.google.com/maps?q=40.776974,29.81302&t=h&z=17&hl=${currentLang === 'EN' ? 'en' : 'tr'}&output=embed`}
                 className="absolute inset-0 w-full h-full border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -1458,7 +1382,7 @@ export default function App() {
 
             <div>
               <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">{t('footerContact')}</h4>
-              <p className="text-xs text-slate-400">Yenikent Mah. GMK Cad. No:46H Derince / Kocaeli</p>
+              <p className="text-xs text-slate-400">Yenikent Mah. Gazi Mustafa Kemal Cad. No:46H Derince / Kocaeli</p>
               <p className="text-xs text-slate-400 mt-1">Tel: +90 (539) 589 55 02</p>
               <p className="text-xs text-slate-400">E-posta: info@optisafe.com.tr</p>
             </div>
@@ -1466,9 +1390,6 @@ export default function App() {
             <div>
               <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">{t('footerSocial')}</h4>
               <div className="flex space-x-3">
-                <a href="https://www.instagram.com/optisafetr" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-slate-800 rounded-full hover:bg-[#1e40af] transition text-white" aria-label="Instagram">
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                </a>
                 <a href="https://www.linkedin.com/company/optisafetr" target="_blank" rel="noopener noreferrer" className="p-2.5 bg-slate-800 rounded-full hover:bg-[#1e40af] transition text-white" aria-label="LinkedIn">
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                 </a>
@@ -1486,107 +1407,6 @@ export default function App() {
 
         </div>
       </footer>
-
-      {/* CATALOG PDF MODAL */}
-      {catalogModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
-          onClick={() => !catalogGenerating && setCatalogModalOpen(false)}
-        >
-          <div
-            className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 text-slate-900 relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => !catalogGenerating && setCatalogModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 disabled:opacity-40"
-              disabled={catalogGenerating}
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 rounded-xl bg-blue-50 text-[#1e40af] flex items-center justify-center">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-xl font-black text-slate-900 font-heading leading-tight">{t('catalogTitle')}</h3>
-                <p className="text-xs text-slate-500 mt-0.5">{t('catalogModels', { count: products.length })}</p>
-              </div>
-            </div>
-
-            <p className="text-xs text-slate-600 leading-relaxed mb-5">
-              {t('catalogDesc')}
-            </p>
-
-            <ul className="space-y-2 mb-5 text-xs text-slate-600">
-              {[
-                t('catalogItem1'),
-                t('catalogItem2'),
-                t('catalogItem3'),
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-[#1e40af] shrink-0" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-
-            {catalogGenerating && (
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1.5">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1e40af]" />
-                    {t('catalogPreparing')}
-                  </span>
-                  <span>%{catalogProgress}</span>
-                </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#1e40af] rounded-full transition-all duration-300"
-                    style={{ width: `${catalogProgress}%` }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {catalogFileName && !catalogGenerating && (
-              <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-bold text-emerald-800">{t('catalogDownloaded')}</p>
-                  <p className="text-[11px] text-emerald-700 mt-0.5">{catalogFileName}</p>
-                </div>
-              </div>
-            )}
-
-            {catalogError && (
-              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-xs text-red-700">
-                {catalogError}
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={handleDownloadCatalog}
-              disabled={catalogGenerating}
-              className="w-full bg-[#1e40af] hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold text-xs uppercase py-3.5 rounded-xl transition shadow flex items-center justify-center gap-2"
-            >
-              {catalogGenerating ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {t('catalogCreating')}
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  {catalogFileName ? t('catalogDownloadAgain') : t('catalogDownloadPdf')}
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* PRODUCT DETAIL MODAL */}
       {selectedProduct && (
@@ -1708,20 +1528,9 @@ export default function App() {
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3 pt-1 border-t border-slate-100">
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase py-3.5 rounded-xl transition text-center shadow flex items-center justify-center gap-1.5"
-                >
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
-                  </svg>
-                  <span>{t('quoteWhatsapp')}</span>
-                </a>
                 <button
                   onClick={() => setSelectedProduct(null)}
-                  className="border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase px-6 py-3.5 rounded-xl transition"
+                  className="w-full border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase px-6 py-3.5 rounded-xl transition"
                 >
                   {t('close')}
                 </button>
@@ -1769,28 +1578,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* ---------------------------------------------------- */}
-      {/* FLOATING WHATSAPP BUTTON (ALWAYS VISIBLE BOTTOM RIGHT) */}
-      {/* ---------------------------------------------------- */}
-      <a 
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={t('whatsappContact')}
-        className="fixed bottom-6 right-6 z-50 group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white p-3.5 sm:px-5 sm:py-3.5 rounded-full shadow-2xl shadow-emerald-500/50 transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-white/20"
-      >
-        <span className="relative flex h-3 w-3 -mr-1">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-100"></span>
-        </span>
-        <svg className="w-6 h-6 fill-current shrink-0" viewBox="0 0 24 24">
-          <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/>
-        </svg>
-        <span className="hidden sm:inline-block font-extrabold text-xs tracking-wider uppercase">
-          {t('whatsappSupport')}
-        </span>
-      </a>
 
     </div>
   );
