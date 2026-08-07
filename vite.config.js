@@ -6,31 +6,27 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const glassesSrc = path.resolve(__dirname, 'gözlük resimleri')
 const glassesPublic = path.resolve(__dirname, 'public/glasses')
 const glassesDist = path.resolve(__dirname, 'dist/glasses')
 
-function copyDir(src, dest) {
-  if (!fs.existsSync(src)) {
-    console.warn(`[copy-glasses] Source missing: ${src}`)
-    return
-  }
-  fs.mkdirSync(dest, { recursive: true })
-  fs.cpSync(src, dest, { recursive: true, force: true })
-}
+import { convertImages } from './scripts/convert-images.js'
 
-/** Copies glasses images into public/dist — Windows-safe (no symlinks). */
+/** Copies and converts glasses images into public/dist — Windows-safe (no symlinks). */
 function copyGlassesPlugin() {
   return {
     name: 'copy-glasses',
-    buildStart() {
-      // Dev + build: ensure public/glasses exists as a real folder
-      copyDir(glassesSrc, glassesPublic)
+    async buildStart() {
+      // Ensure webp conversion runs automatically
+      await convertImages()
     },
     closeBundle() {
-      // Guarantee dist/glasses after Vite public copy
-      copyDir(glassesSrc, glassesDist)
-      console.log('[copy-glasses] Copied glasses → dist/glasses')
+      // Guarantee dist/glasses exists
+      fs.mkdirSync(glassesDist, { recursive: true })
+      // Copy the converted webp images from public/glasses to dist/glasses
+      if (fs.existsSync(glassesPublic)) {
+        fs.cpSync(glassesPublic, glassesDist, { recursive: true, force: true })
+      }
+      console.log('[copy-glasses] Copied converted webp glasses → dist/glasses')
     },
   }
 }

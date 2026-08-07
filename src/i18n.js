@@ -175,6 +175,33 @@ export const translations = {
     whatsappMsg:
       'Merhaba, OptiSafe numaralı iş güvenliği gözlükleri hakkında bilgi almak istiyorum.',
     catalogError: 'Katalog oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
+    
+    // Slug Translations
+    slugHome: 'ana-sayfa',
+    slugProducts: 'urunlerimiz',
+    slugBenefits: 'avantajlarimiz',
+    slugAbout: 'hakkimizda',
+    slugContact: 'iletisim',
+
+    // Product Tags
+    tagLiquidDust: 'Sıvı & Toz Korumalı',
+    tagImpact: 'Darbe Korumalı',
+    tagProLiquidDust: 'PRO • Sıvı & Toz',
+    tagProClear: 'PRO • Şeffaf',
+    tagSmallBlueClear: 'Small • Mavi/Şeffaf',
+    tagSmallGray: 'Small • Gri',
+    tagLargeBlueClear: 'Large • Mavi/Şeffaf',
+    tagLargeGray: 'Large • Gri',
+    tagBlackOneSize: 'Siyah • Tek Beden',
+    tagBlackSmallFit: 'Siyah • Small Fit',
+    tagBlackCompact: 'Siyah • Kompakt',
+    tagGrayRed: 'Gri/Kırmızı',
+    tagGrayRedHighDiopter: 'Gri/Kırmızı • Yüksek Diyoptri',
+    tagGrayLarge: 'Gri • Large',
+    tagGraySmall: 'Gri • Small',
+    tagClearSport: 'Şeffaf • Spor',
+    tagWeldingDin5: 'Kaynak • DIN 5',
+    tagWeldingDin3: 'Kaynak • DIN 3',
   },
 
   EN: {
@@ -353,6 +380,33 @@ export const translations = {
     whatsappMsg:
       'Hello, I would like information about OptiSafe prescription safety glasses.',
     catalogError: 'An error occurred while creating the catalog. Please try again.',
+    
+    // Slug Translations
+    slugHome: 'home',
+    slugProducts: 'products',
+    slugBenefits: 'benefits',
+    slugAbout: 'about',
+    slugContact: 'contact',
+
+    // Product Tags
+    tagLiquidDust: 'Liquid & Dust Protection',
+    tagImpact: 'Impact Protection',
+    tagProLiquidDust: 'PRO • Liquid & Dust',
+    tagProClear: 'PRO • Clear',
+    tagSmallBlueClear: 'Small • Blue/Clear',
+    tagSmallGray: 'Small • Grey',
+    tagLargeBlueClear: 'Large • Blue/Clear',
+    tagLargeGray: 'Large • Grey',
+    tagBlackOneSize: 'Black • One Size',
+    tagBlackSmallFit: 'Black • Small Fit',
+    tagBlackCompact: 'Black • Compact',
+    tagGrayRed: 'Grey/Red',
+    tagGrayRedHighDiopter: 'Grey/Red • High Diopter',
+    tagGrayLarge: 'Grey • Large',
+    tagGraySmall: 'Grey • Small',
+    tagClearSport: 'Clear • Sport',
+    tagWeldingDin5: 'Welding • DIN 5',
+    tagWeldingDin3: 'Welding • DIN 3',
   },
 };
 

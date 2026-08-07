@@ -1,0 +1,80 @@
+# OptiSafe - Detaylı Ürün, Standart ve Hizmet Rehberi (LLM Full Version)
+
+## 1. Şirket Özeti ve Misyon
+OptiSafe, endüstriyel tesislerde ve iş yerlerinde çalışan personeller için uluslararası standartlara (EN166, EN170, EN172) uygun kişiye özel numaralı iş güvenliği gözlükleri ve koruyucu gözlük donanımları tedarik eden ve üreten lider koruyucu optik markasıdır.
+
+### İletişim Bilgileri
+- **Firma Unvanı**: OptiSafe Koruyucu Optik Çözümleri
+- **Web Sitesi**: https://www.optisafe.com.tr
+- **E-Posta**: info@optisafe.com.tr
+- **Müşteri Hizmetleri / Telefon**: +90 539 589 55 02
+- **Adres**: Yenikent Mah. Gazi Mustafa Kemal Cad. No:46H, Derince / Kocaeli, Türkiye (PK: 41900)
+- **Sosyal Medya**:
+  - Instagram: https://www.instagram.com/optisafetr
+  - LinkedIn: https://www.linkedin.com/company/optisafetr
+
+---
+
+## 2. Standartlar ve Teknik Özellikler
+
+### Sertifikasyon ve Normlar
+- **EN 166**: Kişisel Göz Koruması - Temel Şartlar ve İşaretlemeler.
+- **EN 170**: UV Filtreleri (Ultraviyole koruma standartları).
+- **EN 172**: Endüstriyel Kullanım İçin Güneş Filtreleri.
+- **Darbe Dayanım Sınıfları**:
+  - **F**: Düşük enerjili darbe direnci (45 m/s çelik bilye testi).
+  - **B**: Orta enerjili darbe direnci (120 m/s çelik bilye testi - tam hermetik/goggle modeller için).
+  - **S**: Arttırılmış sağlamlık.
+  - **T**: Aşırı sıcaklıklarda darbe direnci (-5°C ila +55°C).
+
+### Cam Türleri ve Kaplamalar
+- **Polikarbonat (PC)**: Yüksek kırılma ve darbe direnci, hafif yapı.
+- **Trivex / CR39**: Optik berraklık ve kimyasal direnç odaklı özel reçeteli camlar.
+- **Çizilmez Kaplama (Anti-Scratch / Hard Coat)**: Endüstriyel çizilmelere karşı maksimum ömür.
+- **Buğulanmaz Kaplama (Anti-Fog / AF)**: Nemli ve yüksek ısı değişkenliği olan ortamlarda buğulanmayı önleyen kaplama.
+
+---
+
+## 3. Ürün Modelleri ve Özellikleri
+
+### 1. Compact PRO (Ref. 207)
+- **Model Kodu**: Ref. 207.01, 207.02, 207.03, 207.04
+- **Açıklama**: Maksimum koruma ve ergonomi sunan, şakak açısı ayarlanabilir reçeteli iş güvenliği gözlüğü.
+- **Özellikler**: Sızdırmaz conta (hermetik) opsiyonu, ayarlanabilir saplar, çıkarılabilir iç tampon.
+
+### 2. Organik & Organik Hermetic (Ref. 158 / Ref. 211)
+- **Model Kodu**: Ref. 158.01, 158.03, 158.08, 211.01, 211.02
+- **Açıklama**: Toz, sıvı ve kimyasal sıçramalara karşı tam sızdırmazlık sağlayan hermetik conta yapılı reçeteli model.
+- **Özellikler**: Köpük contalı (With Foam) ve contasız seçenekler, yüksek hava sirkülasyon kanalları.
+
+### 3. Duplex (Ref. 1095)
+- **Model Kodu**: Ref. 1095.01, 1095.02
+- **Açıklama**: Çift enjeksiyonlu çerçeve teknolojisi ve panoramik koruma açısı.
+- **Özellikler**: Esnek burun pedleri, geniş görüş alanı, numara işlenebilir reçeteli iç klips veya direk cam montajı.
+
+### 4. Aguila & Aguila Small (Ref. 140 / Ref. 159)
+- **Model Kodu**: Ref. 140.01, 159.01
+- **Açıklama**: Geniş ve küçük yüz tipleri için iki ayrı boyutta sunulan yüksek konforlu koruyucu gözlük.
+
+### 5. Brave & Brave Small (Ref. 139 / Ref. 125)
+- **Model Kodu**: Ref. 139.01, 125.01
+- **Açıklama**: Spor görünüm ve yüksek darbe emilimi sağlayan esnek çerçeve yapısı.
+
+### 6. Moving (Ref. 119) & Europa (Ref. 2009) & Fever (Ref. 144)
+- **Açıklama**: Endüstriyel montaj, lojistik, kimya ve imalat sektörleri için özel geliştirilmiş hafif reçeteli çerçeveler.
+
+---
+
+## 4. Reçeteli (Numaralı) İş Güvenliği Gözlüğü Tedarik Süreci
+
+1. **Reçete ve Ölçü Alımı**: Çalışanın göz doktoru onaylı reçetesi (SPH, CYL, AXIS, PD - Pupil Mesafesi) alınır.
+2. **Çerçeve ve Cam Seçimi**: Çalışma ortamındaki risk faktörlerine (darbe, kimyasal, UV vb.) uygun çerçeve ve cam kaplaması belirlenir.
+3. **Üretim & Montaj**: Sertifikalı laboratuvar ortamında EN166 standartlarına uygun olarak montaj gerçekleştirilir.
+4. **Kalite Kontrol ve Teslimat**: Darbe ve optik netlik testlerinden geçen ürünler CE ve EN166 sertifika belgeleri ile teslim edilir.
+
+---
+
+## 5. Dizin ve Bağlantılar
+- **Katalog**: https://www.optisafe.com.tr/pdf/optik.pdf
+- **Ana Sayfa**: https://www.optisafe.com.tr/
+- **Yapay Zeka Özet Dosyası (llm.txt)**: https://www.optisafe.com.tr/llm.txt

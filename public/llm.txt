@@ -1,0 +1,28 @@
+# OptiSafe - Profesyonel ve Kişiye Özel Numaralı İş Güvenliği Gözlükleri
+
+> OptiSafe, EN166 ve Uluslararası İş Güvenliği Standartlarına uygun kişiye özel numaralı iş güvenliği gözlükleri ve endüstriyel koruyucu gözlük çözümleri sunmaktadır.
+
+## Marka ve Genel Bilgiler
+- **Firma Adı**: OptiSafe
+- **Web Sitesi**: https://www.optisafe.com.tr
+- **E-Posta**: info@optisafe.com.tr
+- **Telefon**: +90 539 589 55 02
+- **Adres**: Yenikent Mah. Gazi Mustafa Kemal Cad. No:46H, Derince / Kocaeli, Türkiye (41900)
+- **Sosyal Medya**:
+  - Instagram: https://www.instagram.com/optisafetr
+  - LinkedIn: https://www.linkedin.com/company/optisafetr
+
+## Öne Çıkan Ürün ve Hizmetler
+- **Kişiye Özel Numaralı İş Güvenliği Gözlükleri**: Çalışanların reçetelerine özel (sfrik, silindirik, progresif vb.) üretilen, yüksek darbe dirençli koruyucu camlar ve ergonomik çerçeveler.
+- **Sertifikasyon ve Standartlar**: EN166 (Kişisel Göz Koruması), EN170 (UV Filtreleri), EN172 (Endüstriyel Güneş Filtreleri) standartlarına uygun Avrupa normlarında iş güvenliği gözlükleri.
+- **Öne Çıkan Ürün Serileri**:
+  - **Compact PRO (Ref. 207)**: Yüksek koruma, esnek şakak yapısı, ergonomik tasarım ve sızdırmaz hermetik conta opsiyonu.
+  - **Organik / Organik Hermetic (Ref. 158 / Ref. 211)**: Toz, sıvı ve kimyasal sıçramalarına karşı tam izolasyon sağlayan köpüklü/köpüksüz reçeteli koruyucu gözlükler.
+  - **Duplex (Ref. 1095)**: Çift açılı ayarlanabilir şakak yapısı ve geniş panoramik görüş alanı.
+  - **Aguila & Aguila Small (Ref. 140 / Ref. 159)**: Farklı yüz anatomilerine uygun standart ve küçük boy ergonomik çerçeveler.
+  - **Brave & Brave Small (Ref. 139 / Ref. 125)**: Modern, esnek ve yüksek darbe dayanımlı polikarbonat yapı.
+  - **Fever (Ref. 144) & Europa (Ref. 2009)**: Dayanıklı ve hafif endüstriyel kullanım serileri.
+
+## İletişim ve Detaylı Kaynaklar
+- [Optik Ürün Kataloğu (PDF)](https://www.optisafe.com.tr/pdf/optik.pdf): Ürün yelpazesi ve teknik katalog
+- [Detaylı Yapay Zeka Rehberi](https://www.optisafe.com.tr/llm-full.txt): Ürün spesifikasyonları, reçete detayları ve teknik bilgiler

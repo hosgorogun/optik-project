@@ -28,7 +28,7 @@ const GLASS_VIEWS = ['FrontalView', 'AngledView', 'InteriorView'];
 
 const glassImages = (base) =>
   GLASS_VIEWS.map(
-    (view) => asset(`glasses/${base}_${view}-300dpi.jpg`)
+    (view) => asset(`glasses/${base}_${view}-300dpi.webp`)
   );
 
 function ProductImageCarousel({ images, alt, onImageClick, className = '', imgClassName = '', initialIndex = 0 }) {
@@ -135,23 +135,23 @@ export default function App() {
       code: 'REF-158.03',
       category: 'hermetic',
       rxSupport: true,
-      tag: 'Sıvı & Toz Korumalı',
+      tag: 'tagLiquidDust',
       badgeBg: 'bg-cyan-700',
-      variant: 'Foam Temple/Band · Tek Beden',
+      variant: currentLang === 'EN' ? 'Foam Temple/Band · One Size' : 'Foam Temple/Band · Tek Beden',
       images: glassImages('Prescription_Ref.158.03_Organik-Hermetic_WithFoam'),
       img: glassImages('Prescription_Ref.158.03_Organik-Hermetic_WithFoam')[0],
       detailImg: glassImages('Prescription_Ref.158.03_Organik-Hermetic_WithFoam')[0],
-      desc: 'Bio-based TR-90 poliamid gövdeli, hermetik foam contalı numaralı iş güvenliği gözlüğü. Toz ve sıvı sıçramalarına karşı tam koruma sunar; 8 saatlik kullanımda yüksek konfor sağlar.',
+      desc: currentLang === 'EN' ? 'Prescription safety glasses with bio-based TR-90 polyamide body and hermetic foam gasket. Offers full protection against dust and liquid splashes; provides high comfort during 8-hour use.' : 'Bio-based TR-90 poliamid gövdeli, hermetik foam contalı numaralı iş güvenliği gözlüğü. Toz ve sıvı sıçramalarına karşı tam koruma sunar; 8 saatlik kullanımda yüksek konfor sağlar.',
       specs: {
         standard: 'EN166 3 4 F T',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek hızlı parçacık direnci (F T)',
-        coating: 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
-        frame: 'Bio-based TR-90 poliamid',
-        size: 'Tek beden · Kalibre 56',
-        protection: 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High-speed particle resistance (F T)' : 'Yüksek hızlı parçacık direnci (F T)',
+        coating: currentLang === 'EN' ? 'PRIVILEGE (anti-scratch & anti-fog), Bluestop, anti-reflective, hydrophobic' : 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
+        frame: currentLang === 'EN' ? 'Bio-based TR-90 polyamide' : 'Bio-based TR-90 poliamid',
+        size: currentLang === 'EN' ? 'One size · Caliber 56' : 'Tek beden · Kalibre 56',
+        protection: currentLang === 'EN' ? 'Liquid droplets / splash (3) · Large dust particles (4)' : 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
       },
-      features: ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', t('kitItem3'), 'Sap + bant çift bağlantı seçeneği', 'PRIVILEGE çizilmez & buğulanmaz kaplama', 'Mavi ışık filtresi (Bluestop)', 'Organik, polikarbonat veya Trivex numaralı lens']
+      features: currentLang === 'EN' ? ['Inner hermetic foam gasket', 'Dielectric structure', 'Non-slip nose pad', t('kitItem3'), 'Temple + band dual connection option', 'PRIVILEGE anti-scratch & anti-fog coating', 'Blue light filter (Bluestop)', 'Organic, polycarbonate or Trivex prescription lens'] : ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', t('kitItem3'), 'Sap + bant çift bağlantı seçeneği', 'PRIVILEGE çizilmez & buğulanmaz kaplama', 'Mavi ışık filtresi (Bluestop)', 'Organik, polikarbonat veya Trivex numaralı lens']
     },
     {
       id: '158-08-organik-hermetic',
@@ -160,23 +160,23 @@ export default function App() {
       code: 'REF-158.08',
       category: 'hermetic',
       rxSupport: true,
-      tag: 'Sıvı & Toz Korumalı',
+      tag: 'tagLiquidDust',
       badgeBg: 'bg-cyan-700',
-      variant: 'Foam Band · Tek Beden',
+      variant: currentLang === 'EN' ? 'Foam Band · One Size' : 'Foam Band · Tek Beden',
       images: glassImages('Prescription_Ref.158.08_Organik-Hermetic'),
       img: glassImages('Prescription_Ref.158.08_Organik-Hermetic')[0],
       detailImg: glassImages('Prescription_Ref.158.08_Organik-Hermetic')[0],
-      desc: 'Hermetik foam contalı ve bant bağlantılı Organik Hermetic modeli. Ultra dayanıklı gövde ile sıvı ve toz koruması; EN166 sertifikalı numaralı/plano kullanım.',
+      desc: currentLang === 'EN' ? 'Organik Hermetic model with hermetic foam gasket and head strap connection. Ultra-durable body providing liquid and dust protection; EN166 certified prescription/plano use.' : 'Hermetik foam contalı ve bant bağlantılı Organik Hermetic modeli. Ultra dayanıklı gövde ile sıvı ve toz koruması; EN166 sertifikalı numaralı/plano kullanım.',
       specs: {
         standard: 'EN166 3 4 F T',
-        prescription: 'Organik / Polikarbonat numaralı lens',
-        impact: 'Yüksek hızlı parçacık direnci (F T)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'TR-90 poliamid',
-        size: 'Tek beden · Kalibre 56',
-        protection: 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate prescription lens' : 'Organik / Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'High-speed particle resistance (F T)' : 'Yüksek hızlı parçacık direnci (F T)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'TR-90 polyamide' : 'TR-90 poliamid',
+        size: currentLang === 'EN' ? 'One size · Caliber 56' : 'Tek beden · Kalibre 56',
+        protection: currentLang === 'EN' ? 'Liquid droplets / splash (3) · Large dust particles (4)' : 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
       },
-      features: ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', 'Ayarlanabilir elastik bant bağlantısı', 'Sıvı ve toz sızdırmazlık', 'Çizilmez & buğulanmaz lens seçenekleri']
+      features: currentLang === 'EN' ? ['Inner hermetic foam gasket', 'Dielectric structure', 'Non-slip nose pad', 'Adjustable elastic band connection', 'Liquid and dust tightness', 'Anti-scratch & anti-fog lens options'] : ['İç hermetik foam conta', 'Dielektrik yapı', 'Kaymaz burun pedi', 'Ayarlanabilir elastik bant bağlantısı', 'Sıvı ve toz sızdırmazlık', 'Çizilmez & buğulanmaz lens seçenekleri']
     },
     {
       id: '158-01-organik',
@@ -185,23 +185,23 @@ export default function App() {
       code: 'REF-158.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Darbe Korumalı',
+      tag: 'tagImpact',
       badgeBg: 'bg-[#1e40af]',
-      variant: 'Without Foam · Tek Beden',
+      variant: currentLang === 'EN' ? 'Without Foam · One Size' : 'Without Foam · Tek Beden',
       images: glassImages('Prescription_Ref.158.01_Organik_WithoutFoam'),
       img: glassImages('Prescription_Ref.158.01_Organik_WithoutFoam')[0],
       detailImg: glassImages('Prescription_Ref.158.01_Organik_WithoutFoam')[0],
-      desc: 'Foam contasız Organik modeli. Darbe koruması gereken atölye ve saha işleri için hafif, dielektrik TR-90 gövde. Sıvı/toz sızdırmazlık gerektirmeyen kullanımlar için idealdir.',
+      desc: currentLang === 'EN' ? 'Organik model without foam gasket. Lightweight, dielectric TR-90 frame for workshops and field work requiring impact protection. Ideal for applications that do not require liquid/dust tightness.' : 'Foam contasız Organik modeli. Darbe koruması gereken atölye ve saha işleri için hafif, dielektrik TR-90 gövde. Sıvı/toz sızdırmazlık gerektirmeyen kullanımlar için idealdir.',
       specs: {
         standard: 'EN166 F T',
-        prescription: 'Organik / Polikarbonat numaralı lens',
-        impact: 'Mekanik darbe direnci (F T)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'TR-90 poliamid',
-        size: 'Tek beden · Kalibre 56',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate prescription lens' : 'Organik / Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F T)' : 'Mekanik darbe direnci (F T)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'TR-90 polyamide' : 'TR-90 poliamid',
+        size: currentLang === 'EN' ? 'One size · Caliber 56' : 'Tek beden · Kalibre 56',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Foam contasız hafif tasarım', 'Dielektrik yapı', 'Kaymaz burun pedi', 'EN166 F T darbe işareti', 'Numaralı lens uyumlu']
+      features: currentLang === 'EN' ? ['Lightweight design without foam', 'Dielectric structure', 'Non-slip nose pad', 'EN166 F T impact marking', 'Prescription lens compatible'] : ['Foam contasız hafif tasarım', 'Dielektrik yapı', 'Kaymaz burun pedi', 'EN166 F T darbe işareti', 'Numaralı lens uyumlu']
     },
     {
       id: '211-02-organik-hermetic-pro',
@@ -210,23 +210,23 @@ export default function App() {
       code: 'REF-211.02',
       category: 'hermetic',
       rxSupport: true,
-      tag: 'PRO · Sıvı & Toz',
+      tag: 'tagProLiquidDust',
       badgeBg: 'bg-emerald-700',
-      variant: 'Foam Temple/Band · Tek Beden',
+      variant: currentLang === 'EN' ? 'Foam Temple/Band · One Size' : 'Foam Temple/Band · Tek Beden',
       images: glassImages('Prescription_Ref.211.02_Organik-Hermetic-PRO_WithFoam'),
       img: glassImages('Prescription_Ref.211.02_Organik-Hermetic-PRO_WithFoam')[0],
       detailImg: glassImages('Prescription_Ref.211.02_Organik-Hermetic-PRO_WithFoam')[0],
-      desc: 'Organik Hermetic PRO: çevre dostu BIOBALANCE gövde, çevresel foam conta ve sap/bant çift bağlantı. 8 saatlik ergonomi; EN ISO 16321 sertifikalı.',
+      desc: currentLang === 'EN' ? 'Organik Hermetic PRO: eco-friendly BIOBALANCE frame, peripheral foam gasket, and dual temple/strap connection. 8-hour ergonomics; EN ISO 16321 certified.' : 'Organik Hermetic PRO: çevre dostu BIOBALANCE gövde, çevresel foam conta ve sap/bant çift bağlantı. 8 saatlik ergonomi; EN ISO 16321 sertifikalı.',
       specs: {
         standard: 'EN166 / EN ISO 16321 · U1.2 G3 C T 3 4',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'PRIVILEGE buğulanmaz & çizilmez, Bluestop, antirefle, hidrofobik',
-        frame: 'BIOBALANCE eko-sürdürülebilir malzeme',
-        size: 'Tek beden',
-        protection: 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'PRIVILEGE anti-fog & anti-scratch, Bluestop, anti-reflective, hydrophobic' : 'PRIVILEGE buğulanmaz & çizilmez, Bluestop, antirefle, hidrofobik',
+        frame: currentLang === 'EN' ? 'BIOBALANCE eco-sustainable material' : 'BIOBALANCE eko-sürdürülebilir malzeme',
+        size: currentLang === 'EN' ? 'One size' : 'Tek beden',
+        protection: currentLang === 'EN' ? 'Liquid droplets / splash (3) · Large dust particles (4)' : 'Sıvı damlacık / sıçrama (3) · Büyük toz parçacıkları (4)',
       },
-      features: ['BIOBALANCE eko çerçeve', 'Dielektrik yapı', 'Çevresel hermetik foam conta', 'Sap + elastik bant çift bağlantı', 'PRIVILEGE kaplama', 'EN ISO 16321 sertifikası', '8 saatlik üstün konfor']
+      features: currentLang === 'EN' ? ['BIOBALANCE eco frame', 'Dielectric structure', 'Peripheral hermetic foam gasket', 'Temple + elastic band dual connection', 'PRIVILEGE coating', 'EN ISO 16321 certification', '8-hour superior comfort'] : ['BIOBALANCE eko çerçeve', 'Dielektrik yapı', 'Çevresel hermetik foam conta', 'Sap + elastik bant çift bağlantı', 'PRIVILEGE kaplama', 'EN ISO 16321 sertifikası', '8 saatlik üstün konfor']
     },
     {
       id: '211-01-organik-pro',
@@ -235,23 +235,23 @@ export default function App() {
       code: 'REF-211.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'PRO · Şeffaf',
+      tag: 'tagProClear',
       badgeBg: 'bg-emerald-700',
-      variant: 'Transparent · Tek Beden',
+      variant: currentLang === 'EN' ? 'Transparent · One Size' : 'Transparent · Tek Beden',
       images: glassImages('Prescription_Ref.211.01_Organik-PRO'),
       img: glassImages('Prescription_Ref.211.01_Organik-PRO')[0],
       detailImg: glassImages('Prescription_Ref.211.01_Organik-PRO')[0],
-      desc: 'Foam ve bant olmadan günlük kullanıma uygun hafif Organik PRO. Modern tasarım, rahat saplar ve eko-sürdürülebilir BIOBALANCE gövde. EN ISO 16321 sertifikalı.',
+      desc: currentLang === 'EN' ? 'Lightweight Organik PRO suitable for daily use without foam and band. Modern design, comfortable temples, and eco-friendly BIOBALANCE frame. EN ISO 16321 certified.' : 'Foam ve bant olmadan günlük kullanıma uygun hafif Organik PRO. Modern tasarım, rahat saplar ve eko-sürdürülebilir BIOBALANCE gövde. EN ISO 16321 sertifikalı.',
       specs: {
         standard: 'EN166 / EN ISO 16321 · U1.2 G3 C T',
-        prescription: 'Polikarbonat / Organik / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
-        frame: 'BIOBALANCE eko-sürdürülebilir malzeme',
-        size: 'Tek beden',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Polycarbonate / Organic / Trivex prescription lens' : 'Polikarbonat / Organik / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'PRIVILEGE, Bluestop, anti-reflective, hydrophobic' : 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
+        frame: currentLang === 'EN' ? 'BIOBALANCE eco-sustainable material' : 'BIOBALANCE eko-sürdürülebilir malzeme',
+        size: currentLang === 'EN' ? 'One size' : 'Tek beden',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['BIOBALANCE eko çerçeve', 'Dielektrik yapı', 'Foam / bant yok — hafif günlük kullanım', 'Modern, konforlu sap tasarımı', 'PRIVILEGE kaplama', 'Mikrofiber kılıf (ACC.04) dahil', 'EN ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['BIOBALANCE eco frame', 'Dielectric structure', 'No foam / band — lightweight daily use', 'Modern, comfortable temple design', 'PRIVILEGE coating', 'Microfiber pouch (ACC.04) included', 'EN ISO 16321 certification'] : ['BIOBALANCE eko çerçeve', 'Dielektrik yapı', 'Foam / bant yok — hafif günlük kullanım', 'Modern, konforlu sap tasarımı', 'PRIVILEGE kaplama', 'Mikrofiber kılıf (ACC.04) dahil', 'EN ISO 16321 sertifikası']
     },
     {
       id: '207-01-compact-pro',
@@ -260,23 +260,23 @@ export default function App() {
       code: 'REF-207.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Small · Mavi/Şeffaf',
+      tag: 'tagSmallBlueClear',
       badgeBg: 'bg-indigo-600',
       variant: 'Blue/Transparent · Small',
       images: glassImages('Prescription_Ref.207.01_Compact-PRO'),
       img: glassImages('Prescription_Ref.207.01_Compact-PRO')[0],
       detailImg: glassImages('Prescription_Ref.207.01_Compact-PRO')[0],
-      desc: 'Compact PRO Small beden, mavi/şeffaf. Bio-based gövde, 8 saatlik ergonomi ve PRIVILEGE kaplama. İki beden seçeneği olan PRO serisinin küçük boyutu.',
+      desc: currentLang === 'EN' ? 'Compact PRO Small size, blue/transparent. Bio-based body, 8-hour ergonomics, and PRIVILEGE coating. The smaller size of the PRO series.' : 'Compact PRO Small beden, mavi/şeffaf. Bio-based gövde, 8 saatlik ergonomi ve PRIVILEGE kaplama. İki beden seçeneği olan PRO serisinin küçük boyutu.',
       specs: {
         standard: 'EN ISO 16321 C T',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
-        frame: 'Bio-based malzeme',
-        size: 'Small · Kalibre 51',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'PRIVILEGE (anti-scratch & anti-fog), Bluestop, anti-reflective, hydrophobic' : 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
+        frame: currentLang === 'EN' ? 'Bio-based material' : 'Bio-based malzeme',
+        size: currentLang === 'EN' ? 'Small · Caliber 51' : 'Small · Kalibre 51',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Bio-based dielektrik gövde', 'Modern Compact PRO tasarımı', 'Small / Large iki beden seçeneği', 'PRIVILEGE çizilmez & buğulanmaz', 'EN ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['Bio-based dielectric frame', 'Modern Compact PRO design', 'Small / Large two size options', 'PRIVILEGE anti-scratch & anti-fog', 'EN ISO 16321 certification'] : ['Bio-based dielektrik gövde', 'Modern Compact PRO tasarımı', 'Small / Large iki beden seçeneği', 'PRIVILEGE çizilmez & buğulanmaz', 'EN ISO 16321 sertifikası']
     },
     {
       id: '207-02-compact-pro',
@@ -285,23 +285,23 @@ export default function App() {
       code: 'REF-207.02',
       category: 'impact',
       rxSupport: true,
-      tag: 'Small · Gri',
+      tag: 'tagSmallGray',
       badgeBg: 'bg-indigo-600',
       variant: 'Grey · Small',
       images: glassImages('Prescription_Ref.207.02_Compact-PRO'),
       img: glassImages('Prescription_Ref.207.02_Compact-PRO')[0],
       detailImg: glassImages('Prescription_Ref.207.02_Compact-PRO')[0],
-      desc: 'Compact PRO Small beden, gri. Bio-based gövde ve PRIVILEGE kaplama; G3 güneş filtresi işaretli varyant. EN ISO 16321 sertifikalı.',
+      desc: currentLang === 'EN' ? 'Compact PRO Small size, grey. Bio-based body and PRIVILEGE coating; G3 solar filter variant. EN ISO 16321 certified.' : 'Compact PRO Small beden, gri. Bio-based gövde ve PRIVILEGE kaplama; G3 güneş filtresi işaretli varyant. EN ISO 16321 sertifikalı.',
       specs: {
         standard: 'EN ISO 16321 G3 C T',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
-        frame: 'Bio-based malzeme',
-        size: 'Small · Kalibre 51',
-        protection: 'Darbe koruması · G3 solar filtre seçeneği',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'PRIVILEGE, Bluestop, anti-reflective, hydrophobic' : 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
+        frame: currentLang === 'EN' ? 'Bio-based material' : 'Bio-based malzeme',
+        size: currentLang === 'EN' ? 'Small · Caliber 51' : 'Small · Kalibre 51',
+        protection: currentLang === 'EN' ? 'Impact protection · G3 solar filter option' : 'Darbe koruması · G3 solar filtre seçeneği',
       },
-      features: ['Bio-based dielektrik gövde', 'Gri Compact PRO Small', 'PRIVILEGE kaplama', 'G3 solar / fotokromik / polarize filtre seçenekleri', 'EN ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['Bio-based dielectric frame', 'Grey Compact PRO Small', 'PRIVILEGE coating', 'G3 solar / photochromic / polarized filter options', 'EN ISO 16321 certification'] : ['Bio-based dielektrik gövde', 'Gri Compact PRO Small', 'PRIVILEGE kaplama', 'G3 solar / fotokromik / polarize filtre seçenekleri', 'EN ISO 16321 sertifikası']
     },
     {
       id: '207-03-compact-pro',
@@ -310,23 +310,23 @@ export default function App() {
       code: 'REF-207.03',
       category: 'impact',
       rxSupport: true,
-      tag: 'Large · Mavi/Şeffaf',
+      tag: 'tagLargeBlueClear',
       badgeBg: 'bg-indigo-600',
       variant: 'Blue/Transparent · Large',
       images: glassImages('Prescription_Ref.207.03_Compact-PRO'),
       img: glassImages('Prescription_Ref.207.03_Compact-PRO')[0],
       detailImg: glassImages('Prescription_Ref.207.03_Compact-PRO')[0],
-      desc: 'Compact PRO Large beden, mavi/şeffaf. Daha geniş yüz yapısı için Large kalibre; bio-based gövde ve PRIVILEGE kaplama.',
+      desc: currentLang === 'EN' ? 'Compact PRO Large size, blue/transparent. Large caliber for wider face structure; bio-based frame and PRIVILEGE coating.' : 'Compact PRO Large beden, mavi/şeffaf. Daha geniş yüz yapısı için Large kalibre; bio-based gövde ve PRIVILEGE kaplama.',
       specs: {
         standard: 'EN ISO 16321 C T',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
-        frame: 'Bio-based malzeme',
-        size: 'Large · Kalibre 55',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'PRIVILEGE (anti-scratch & anti-fog), Bluestop, anti-reflective, hydrophobic' : 'PRIVILEGE (çizilmez & buğulanmaz), Bluestop, antirefle, hidrofobik',
+        frame: currentLang === 'EN' ? 'Bio-based material' : 'Bio-based malzeme',
+        size: currentLang === 'EN' ? 'Large · Caliber 55' : 'Large · Kalibre 55',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Bio-based dielektrik gövde', 'Large beden — geniş yüz uyumu', 'PRIVILEGE çizilmez & buğulanmaz', 'Modern Compact PRO tasarımı', 'EN ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['Bio-based dielectric frame', 'Large size — wide face fit', 'PRIVILEGE anti-scratch & anti-fog', 'Modern Compact PRO design', 'EN ISO 16321 certification'] : ['Bio-based dielektrik gövde', 'Large beden — geniş yüz uyumu', 'PRIVILEGE çizilmez & buğulanmaz', 'Modern Compact PRO tasarımı', 'EN ISO 16321 sertifikası']
     },
     {
       id: '207-04-compact-pro',
@@ -335,23 +335,23 @@ export default function App() {
       code: 'REF-207.04',
       category: 'impact',
       rxSupport: true,
-      tag: 'Large · Gri',
+      tag: 'tagLargeGray',
       badgeBg: 'bg-indigo-600',
       variant: 'Grey · Large',
       images: glassImages('Prescription_Ref.207.04_Compact-PRO'),
       img: glassImages('Prescription_Ref.207.04_Compact-PRO')[0],
       detailImg: glassImages('Prescription_Ref.207.04_Compact-PRO')[0],
-      desc: 'Compact PRO Large beden, gri. Endüstriyel numaralı güvenlik gözlüğü; bio-based gövde, PRIVILEGE kaplama ve G3 solar filtre seçenekleri.',
+      desc: currentLang === 'EN' ? 'Compact PRO Large size, grey. Industrial prescription safety glasses; bio-based frame, PRIVILEGE coating, and G3 solar filter options.' : 'Compact PRO Large beden, gri. Endüstriyel numaralı güvenlik gözlüğü; bio-based gövde, PRIVILEGE kaplama ve G3 solar filtre seçenekleri.',
       specs: {
         standard: 'EN ISO 16321 G3 C T',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
-        frame: 'Bio-based malzeme',
-        size: 'Large · Kalibre 55',
-        protection: 'Darbe koruması · G3 solar filtre seçeneği',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'PRIVILEGE, Bluestop, anti-reflective, hydrophobic' : 'PRIVILEGE, Bluestop, antirefle, hidrofobik',
+        frame: currentLang === 'EN' ? 'Bio-based material' : 'Bio-based malzeme',
+        size: currentLang === 'EN' ? 'Large · Caliber 55' : 'Large · Kalibre 55',
+        protection: currentLang === 'EN' ? 'Impact protection · G3 solar filter option' : 'Darbe koruması · G3 solar filtre seçeneği',
       },
-      features: ['Bio-based dielektrik gövde', 'Gri Compact PRO Large', 'PRIVILEGE kaplama', 'Fotokromik / polarize / solar filtre seçenekleri', 'EN ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['Bio-based dielectric frame', 'Grey Compact PRO Large', 'PRIVILEGE coating', 'Photochromic / polarized / solar filter options', 'EN ISO 16321 certification'] : ['Bio-based dielektrik gövde', 'Gri Compact PRO Large', 'PRIVILEGE kaplama', 'Fotokromik / polarize / solar filtre seçenekleri', 'EN ISO 16321 sertifikası']
     },
     {
       id: '139-01-brave',
@@ -360,23 +360,23 @@ export default function App() {
       code: 'REF-139.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Siyah · Tek Beden',
+      tag: 'tagBlackOneSize',
       badgeBg: 'bg-slate-700',
-      variant: 'Black · Tek Beden',
+      variant: currentLang === 'EN' ? 'Black · One Size' : 'Black · Tek Beden',
       images: glassImages('Prescription_Ref.139.01_Brave'),
       img: glassImages('Prescription_Ref.139.01_Brave')[0],
       detailImg: glassImages('Prescription_Ref.139.01_Brave')[0],
-      desc: 'TR-90 poliamid Brave modeli: modern, hafif tasarım; yan siperlikler ve geniş görüş alanı. Atölye ve ofis kullanımı için ideal darbe korumalı numaralı gözlük.',
+      desc: currentLang === 'EN' ? 'TR-90 polyamide Brave model: modern, lightweight design; side shields and wide field of view. Ideal prescription safety glasses with impact protection for workshop and office use.' : 'TR-90 poliamid Brave modeli: modern, hafif tasarım; yan siperlikler ve geniş görüş alanı. Atölye ve ofis kullanımı için ideal darbe korumalı numaralı gözlük.',
       specs: {
         standard: 'EN166 F',
-        prescription: 'Organik / Polikarbonat numaralı lens',
-        impact: 'Mekanik darbe direnci (F)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'TR-90 poliamid',
-        size: 'Tek beden · Kalibre 56',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate prescription lens' : 'Organik / Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F)' : 'Mekanik darbe direnci (F)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'TR-90 polyamide' : 'TR-90 poliamid',
+        size: currentLang === 'EN' ? 'One size · Caliber 56' : 'Tek beden · Kalibre 56',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['TR-90 hafif gövde', 'Yan siperlikler', 'Geniş görüş alanı', 'Modern ofis / atölye tasarımı', 'Numaralı lens uyumlu']
+      features: currentLang === 'EN' ? ['TR-90 lightweight frame', 'Side shields', 'Wide field of view', 'Modern office / workshop design', 'Prescription lens compatible'] : ['TR-90 hafif gövde', 'Yan siperlikler', 'Geniş görüş alanı', 'Modern ofis / atölye tasarımı', 'Numaralı lens uyumlu']
     },
     {
       id: '125-01-brave-small',
@@ -385,23 +385,23 @@ export default function App() {
       code: 'REF-125.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Siyah · Small Fit',
+      tag: 'tagBlackSmallFit',
       badgeBg: 'bg-slate-700',
       variant: 'Black · Small Fit',
       images: glassImages('Prescription_Ref.125.01_Brave-Small'),
       img: glassImages('Prescription_Ref.125.01_Brave-Small')[0],
       detailImg: glassImages('Prescription_Ref.125.01_Brave-Small')[0],
-      desc: 'Brave Small: daha küçük yüz yapıları için biobased poliamid gövde. Yan siperlikler, kordon ve geniş görüş alanı; atölye ve ofis için hafif darbe koruması.',
+      desc: currentLang === 'EN' ? 'Brave Small: biobased polyamide body for smaller face shapes. Side shields, cord, and wide field of view; lightweight impact protection for workshop and office.' : 'Brave Small: daha küçük yüz yapıları için biobased poliamid gövde. Yan siperlikler, kordon ve geniş görüş alanı; atölye ve ofis için hafif darbe koruması.',
       specs: {
         standard: 'EN166 F',
-        prescription: 'Organik / Polikarbonat numaralı lens',
-        impact: 'Mekanik darbe direnci (F)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'Biobased poliamid',
-        size: 'Small fit · Kalibre 54',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate prescription lens' : 'Organik / Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F)' : 'Mekanik darbe direnci (F)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'Biobased polyamide' : 'Biobased poliamid',
+        size: currentLang === 'EN' ? 'Small fit · Caliber 54' : 'Small fit · Kalibre 54',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Biobased hafif gövde', 'Yan siperlikler', 'Kordon dahil', 'Küçük yüz uyumu (Cal.54)', 'Geniş görüş alanı']
+      features: currentLang === 'EN' ? ['Biobased lightweight frame', 'Side shields', 'Cord included', 'Small face fit (Cal.54)', 'Wide field of view'] : ['Biobased hafif gövde', 'Yan siperlikler', 'Kordon dahil', 'Küçük yüz uyumu (Cal.54)', 'Geniş görüş alanı']
     },
     {
       id: '144-01-fever',
@@ -410,23 +410,23 @@ export default function App() {
       code: 'REF-144.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Siyah · Kompakt',
+      tag: 'tagBlackCompact',
       badgeBg: 'bg-slate-700',
-      variant: 'Black · Tek Beden',
+      variant: currentLang === 'EN' ? 'Black · One Size' : 'Black · Tek Beden',
       images: glassImages('Prescription_Ref.144.01_Fever'),
       img: glassImages('Prescription_Ref.144.01_Fever')[0],
       detailImg: glassImages('Prescription_Ref.144.01_Fever')[0],
-      desc: 'Fever: TR-90 poliamid, kompakt kalibre 49. Modern hafif tasarım, yan siperlikler ve geniş görüş; atölye ve ofis darbe koruması.',
+      desc: currentLang === 'EN' ? 'Fever: TR-90 polyamide, compact caliber 49. Modern lightweight design, side shields, and wide field of view; impact protection for workshop and office.' : 'Fever: TR-90 poliamid, kompakt kalibre 49. Modern hafif tasarım, yan siperlikler ve geniş görüş; atölye ve ofis darbe koruması.',
       specs: {
         standard: 'EN166 F',
-        prescription: 'Organik / Polikarbonat numaralı lens',
-        impact: 'Mekanik darbe direnci (F)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'TR-90 poliamid',
-        size: 'Tek beden · Kalibre 49',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate prescription lens' : 'Organik / Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F)' : 'Mekanik darbe direnci (F)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'TR-90 polyamide' : 'TR-90 poliamid',
+        size: currentLang === 'EN' ? 'One size · Caliber 49' : 'Tek beden · Kalibre 49',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['TR-90 hafif gövde', 'Kompakt kalibre 49', 'Yan siperlikler', 'Modern tasarım', 'Geniş görüş alanı']
+      features: currentLang === 'EN' ? ['TR-90 lightweight frame', 'Compact caliber 49', 'Side shields', 'Modern design', 'Wide field of view'] : ['TR-90 hafif gövde', 'Kompakt kalibre 49', 'Yan siperlikler', 'Modern tasarım', 'Geniş görüş alanı']
     },
     {
       id: '2009-01-europa',
@@ -435,23 +435,23 @@ export default function App() {
       code: 'REF-2009.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Gri/Kırmızı',
+      tag: 'tagGrayRed',
       badgeBg: 'bg-rose-700',
-      variant: 'Grey/Red · Tek Beden',
+      variant: currentLang === 'EN' ? 'Grey/Red · One Size' : 'Grey/Red · Tek Beden',
       images: glassImages('Prescription_Ref.2009.01_Europa'),
       img: glassImages('Prescription_Ref.2009.01_Europa')[0],
       detailImg: glassImages('Prescription_Ref.2009.01_Europa')[0],
-      desc: 'Europa: naylon gövdeli klasik tasarım, ergonomik saplar ve yan siperlikler. ISO 16321 darbe korumalı numaralı iş güvenliği gözlüğü.',
+      desc: currentLang === 'EN' ? 'Europa: classic design with nylon frame, ergonomic temples, and side shields. ISO 16321 impact-protected prescription safety glasses.' : 'Europa: naylon gövdeli klasik tasarım, ergonomik saplar ve yan siperlikler. ISO 16321 darbe korumalı numaralı iş güvenliği gözlüğü.',
       specs: {
         standard: 'EN ISO 16321 C T',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'Naylon',
-        size: 'Tek beden · Kalibre 55',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'Nylon' : 'Naylon',
+        size: currentLang === 'EN' ? 'One size · Caliber 55' : 'Tek beden · Kalibre 55',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Naylon klasik gövde', 'Yan siperlikler', 'Ergonomik saplar', 'Gri/kırmızı renk kombinasyonu', 'ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['Nylon classic frame', 'Side shields', 'Ergonomic temples', 'Grey/red color combination', 'ISO 16321 certification'] : ['Naylon klasik gövde', 'Yan siperlikler', 'Ergonomik saplar', 'Gri/kırmızı renk kombinasyonu', 'ISO 16321 sertifikası']
     },
     {
       id: '9r50-01-normal',
@@ -460,23 +460,23 @@ export default function App() {
       code: 'REF-9R50.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Gri/Kırmızı · Yüksek Diyoptri',
+      tag: 'tagGrayRedHighDiopter',
       badgeBg: 'bg-rose-700',
-      variant: 'Grey/Red · Tek Beden',
+      variant: currentLang === 'EN' ? 'Grey/Red · One Size' : 'Grey/Red · Tek Beden',
       images: glassImages('Prescription_Ref.9R50.01_Normal'),
       img: glassImages('Prescription_Ref.9R50.01_Normal')[0],
       detailImg: glassImages('Prescription_Ref.9R50.01_Normal')[0],
-      desc: 'Normal 9R50: naylon klasik çerçeve, yan siperlikler ve yüksek diyoptri desteği. İki beden seçeneği ile geniş reçete aralığına uygun numaralı güvenlik gözlüğü.',
+      desc: currentLang === 'EN' ? 'Normal 9R50: nylon classic frame, side shields, and high diopter support. Prescription safety glasses suitable for a wide prescription range with two size options.' : 'Normal 9R50: naylon klasik çerçeve, yan siperlikler ve yüksek diyoptri desteği. İki beden seçeneği ile geniş reçete aralığına uygun numaralı güvenlik gözlüğü.',
       specs: {
         standard: 'EN166 F',
-        prescription: 'Organik / Polikarbonat — yüksek diyoptri uyumlu',
-        impact: 'Mekanik darbe direnci (F)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'Naylon',
-        size: 'Tek beden · Kalibre 51 (2 beden seçeneği)',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate — high diopter compatible' : 'Organik / Polikarbonat — yüksek diyoptri uyumlu',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F)' : 'Mekanik darbe direnci (F)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'Nylon' : 'Naylon',
+        size: currentLang === 'EN' ? 'One size · Caliber 51 (2 size options)' : 'Tek beden · Kalibre 51 (2 beden seçeneği)',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['Naylon klasik gövde', 'Yan siperlikler', 'Yüksek diyoptri / reçete desteği', '2 beden seçeneği', 'Gri/kırmızı renk']
+      features: currentLang === 'EN' ? ['Nylon classic frame', 'Side shields', 'High diopter / prescription support', '2 size options', 'Grey/red color'] : ['Naylon klasik gövde', 'Yan siperlikler', 'Yüksek diyoptri / reçete desteği', '2 beden seçeneği', 'Gri/kırmızı renk']
     },
     {
       id: '140-01-aguila',
@@ -485,23 +485,23 @@ export default function App() {
       code: 'REF-140.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Gri · Large',
+      tag: 'tagGrayLarge',
       badgeBg: 'bg-amber-700',
       variant: 'Grey · Large',
       images: glassImages('Prescription_Ref.140.01_Aguila'),
       img: glassImages('Prescription_Ref.140.01_Aguila')[0],
       detailImg: glassImages('Prescription_Ref.140.01_Aguila')[0],
-      desc: 'Aguila Large: TR-90 poliamid, ultra dayanıklı endüstriyel tasarım. Ayarlanabilir kaymaz saplar; Small (159.01) ile birlikte 2 beden seçeneği.',
+      desc: currentLang === 'EN' ? 'Aguila Large: TR-90 polyamide, ultra-durable industrial design. Adjustable non-slip temples; 2 size options with Small (159.01).' : 'Aguila Large: TR-90 poliamid, ultra dayanıklı endüstriyel tasarım. Ayarlanabilir kaymaz saplar; Small (159.01) ile birlikte 2 beden seçeneği.',
       specs: {
         standard: 'EN166 F',
-        prescription: 'Organik / Polikarbonat numaralı lens',
-        impact: 'Mekanik darbe direnci (F)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'TR-90 poliamid',
-        size: 'Large · Kalibre 55',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate prescription lens' : 'Organik / Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F)' : 'Mekanik darbe direnci (F)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'TR-90 polyamide' : 'TR-90 poliamid',
+        size: currentLang === 'EN' ? 'Large · Caliber 55' : 'Large · Kalibre 55',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['TR-90 endüstriyel gövde', 'Ayarlanabilir sap', 'Kaymaz sap pedleri', 'Large beden', '2 beden seçeneği (140.01 / 159.01)']
+      features: currentLang === 'EN' ? ['TR-90 industrial frame', 'Adjustable temple', 'Non-slip temple pads', 'Large size', '2 size options (140.01 / 159.01)'] : ['TR-90 endüstriyel gövde', 'Ayarlanabilir sap', 'Kaymaz sap pedleri', 'Large beden', '2 beden seçeneği (140.01 / 159.01)']
     },
     {
       id: '159-01-aguila-small',
@@ -510,23 +510,23 @@ export default function App() {
       code: 'REF-159.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Gri · Small',
+      tag: 'tagGraySmall',
       badgeBg: 'bg-amber-700',
       variant: 'Grey · Small',
       images: glassImages('Prescription_Ref.159.01_Aguila-Small'),
       img: glassImages('Prescription_Ref.159.01_Aguila-Small')[0],
       detailImg: glassImages('Prescription_Ref.159.01_Aguila-Small')[0],
-      desc: 'Aguila Small: TR-90 poliamid endüstriyel tasarımın küçük bedeni. Ayarlanabilir kaymaz saplar; Large (140.01) ile birlikte 2 beden seçeneği.',
+      desc: currentLang === 'EN' ? 'Aguila Small: smaller size of the TR-90 polyamide industrial design. Adjustable non-slip temples; 2 size options with Large (140.01).' : 'Aguila Small: TR-90 poliamid endüstriyel tasarımın küçük bedeni. Ayarlanabilir kaymaz saplar; Large (140.01) ile birlikte 2 beden seçeneği.',
       specs: {
         standard: 'EN166 F',
-        prescription: 'Organik / Polikarbonat numaralı lens',
-        impact: 'Mekanik darbe direnci (F)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'TR-90 poliamid',
-        size: 'Small · Kalibre 52',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate prescription lens' : 'Organik / Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F)' : 'Mekanik darbe direnci (F)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'TR-90 polyamide' : 'TR-90 poliamid',
+        size: currentLang === 'EN' ? 'Small · Caliber 52' : 'Small · Kalibre 52',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['TR-90 endüstriyel gövde', 'Ayarlanabilir sap', 'Kaymaz sap pedleri', 'Small beden', '2 beden seçeneği (140.01 / 159.01)']
+      features: currentLang === 'EN' ? ['TR-90 industrial frame', 'Adjustable temple', 'Non-slip temple pads', 'Small size', '2 size options (140.01 / 159.01)'] : ['TR-90 endüstriyel gövde', 'Ayarlanabilir sap', 'Kaymaz sap pedleri', 'Small beden', '2 beden seçeneği (140.01 / 159.01)']
     },
     {
       id: '119-01-moving',
@@ -535,23 +535,23 @@ export default function App() {
       code: 'REF-119.01',
       category: 'impact',
       rxSupport: true,
-      tag: 'Şeffaf · Spor',
+      tag: 'tagClearSport',
       badgeBg: 'bg-sky-600',
-      variant: 'Transparent · Tek Beden',
+      variant: currentLang === 'EN' ? 'Transparent · One Size' : 'Transparent · Tek Beden',
       images: glassImages('Prescription_Ref.119.01_Moving'),
       img: glassImages('Prescription_Ref.119.01_Moving')[0],
       detailImg: glassImages('Prescription_Ref.119.01_Moving')[0],
-      desc: 'Moving: spor tasarımlı TR-90 gövde, panoramik görüş alanı, iç foam ve kaymaz burun pedi. Geniş kalibre 60 ile yüksek görüş konforu.',
+      desc: currentLang === 'EN' ? 'Moving: sporty TR-90 frame, panoramic field of view, inner foam, and non-slip nose pad. High visual comfort with wide caliber 60.' : 'Moving: spor tasarımlı TR-90 gövde, panoramik görüş alanı, iç foam ve kaymaz burun pedi. Geniş kalibre 60 ile yüksek görüş konforu.',
       specs: {
         standard: 'EN166 F',
-        prescription: 'Polikarbonat numaralı lens',
-        impact: 'Mekanik darbe direnci (F)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'TR-90 poliamid',
-        size: 'Tek beden · Kalibre 60',
-        protection: 'Darbe / mekanik parçacık koruması',
+        prescription: currentLang === 'EN' ? 'Polycarbonate prescription lens' : 'Polikarbonat numaralı lens',
+        impact: currentLang === 'EN' ? 'Mechanical impact resistance (F)' : 'Mekanik darbe direnci (F)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'TR-90 polyamide' : 'TR-90 poliamid',
+        size: currentLang === 'EN' ? 'One size · Caliber 60' : 'Tek beden · Kalibre 60',
+        protection: currentLang === 'EN' ? 'Impact / mechanical particle protection' : 'Darbe / mekanik parçacık koruması',
       },
-      features: ['TR-90 spor tasarım', 'İç foam conta', 'Kaymaz burun pedi', 'Panoramik geniş görüş', 'Geniş kalibre 60']
+      features: currentLang === 'EN' ? ['TR-90 sporty design', 'Inner foam gasket', 'Non-slip nose pad', 'Panoramic wide vision', 'Wide caliber 60'] : ['TR-90 spor tasarım', 'İç foam conta', 'Kaymaz burun pedi', 'Panoramik geniş görüş', 'Geniş kalibre 60']
     },
     {
       id: '1095-01-duplex',
@@ -560,23 +560,23 @@ export default function App() {
       code: 'REF-1095.01',
       category: 'welding',
       rxSupport: true,
-      tag: 'Kaynak · DIN 5',
+      tag: 'tagWeldingDin5',
       badgeBg: 'bg-[#971b2f]',
-      variant: 'Black/Green DIN 5 · Tek Beden',
+      variant: currentLang === 'EN' ? 'Black/Green DIN 5 · One Size' : 'Black/Green DIN 5 · Tek Beden',
       images: glassImages('Prescription_Ref.1095.01_Duplex'),
       img: glassImages('Prescription_Ref.1095.01_Duplex')[0],
       detailImg: glassImages('Prescription_Ref.1095.01_Duplex')[0],
-      desc: 'Duplex gaz kaynak gözlüğü: açılır (flip-front) vizör, naylon gövde, yan siperlikler. DIN 5 / W5 kaynak filtresi ile daha koyu gölge koruması; numaralı lens uyumlu.',
+      desc: currentLang === 'EN' ? 'Duplex gas welding glasses: flip-front visor, nylon frame, and side shields. Darker shade protection with DIN 5 / W5 welding filter; prescription lens compatible.' : 'Duplex gaz kaynak gözlüğü: açılır (flip-front) vizör, naylon gövde, yan siperlikler. DIN 5 / W5 kaynak filtresi ile daha koyu gölge koruması; numaralı lens uyumlu.',
       specs: {
         standard: 'EN ISO 16321 UL1.2 W5 C T 1-M',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'Naylon',
-        size: 'Tek beden · Kalibre 55',
-        protection: 'Gaz kaynağı DIN 5 (W5) · Darbe koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'Nylon' : 'Naylon',
+        size: currentLang === 'EN' ? 'One size · Caliber 55' : 'Tek beden · Kalibre 55',
+        protection: currentLang === 'EN' ? 'Gas welding DIN 5 (W5) · Impact protection' : 'Gaz kaynağı DIN 5 (W5) · Darbe koruması',
       },
-      features: ['Açılır flip-front vizör', 'DIN 5 / W5 kaynak filtresi', 'Yan siperlikler', 'Ergonomik saplar', 'Numaralı lens uyumlu', 'ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['Flip-front visor', 'DIN 5 / W5 welding filter', 'Side shields', 'Ergonomic temples', 'Prescription lens compatible', 'ISO 16321 certification'] : ['Açılır flip-front vizör', 'DIN 5 / W5 kaynak filtresi', 'Yan siperlikler', 'Ergonomik saplar', 'Numaralı lens uyumlu', 'ISO 16321 sertifikası']
     },
     {
       id: '1095-02-duplex',
@@ -585,23 +585,23 @@ export default function App() {
       code: 'REF-1095.02',
       category: 'welding',
       rxSupport: true,
-      tag: 'Kaynak · DIN 3',
+      tag: 'tagWeldingDin3',
       badgeBg: 'bg-[#971b2f]',
-      variant: 'Black/Green DIN 3 · Tek Beden',
+      variant: currentLang === 'EN' ? 'Black/Green DIN 3 · One Size' : 'Black/Green DIN 3 · Tek Beden',
       images: glassImages('Prescription_Ref.1095.02_Duplex'),
       img: glassImages('Prescription_Ref.1095.02_Duplex')[0],
       detailImg: glassImages('Prescription_Ref.1095.02_Duplex')[0],
-      desc: 'Duplex gaz kaynak gözlüğü: açılır (flip-front) vizör, naylon gövde, yan siperlikler. DIN 3 / W3 daha açık gölge filtresi; numaralı lens uyumlu.',
+      desc: currentLang === 'EN' ? 'Duplex gas welding glasses: flip-front visor, nylon frame, and side shields. Lighter shade filter with DIN 3 / W3; prescription lens compatible.' : 'Duplex gaz kaynak gözlüğü: açılır (flip-front) vizör, naylon gövde, yan siperlikler. DIN 3 / W3 daha açık gölge filtresi; numaralı lens uyumlu.',
       specs: {
         standard: 'EN ISO 16321 U1.2 W3 C T 1-M',
-        prescription: 'Organik / Polikarbonat / Trivex numaralı lens',
-        impact: 'Yüksek darbe direnci (C T)',
-        coating: 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
-        frame: 'Naylon',
-        size: 'Tek beden · Kalibre 55',
-        protection: 'Gaz kaynağı DIN 3 (W3) · Darbe koruması',
+        prescription: currentLang === 'EN' ? 'Organic / Polycarbonate / Trivex prescription lens' : 'Organik / Polikarbonat / Trivex numaralı lens',
+        impact: currentLang === 'EN' ? 'High impact resistance (C T)' : 'Yüksek darbe direnci (C T)',
+        coating: currentLang === 'EN' ? 'Anti-fog, anti-reflective, anti-scratch, Bluestop, hydrophobic' : 'Antifog, antirefle, çizilmez, Bluestop, hidrofobik',
+        frame: currentLang === 'EN' ? 'Nylon' : 'Naylon',
+        size: currentLang === 'EN' ? 'One size · Caliber 55' : 'Tek beden · Kalibre 55',
+        protection: currentLang === 'EN' ? 'Gas welding DIN 3 (W3) · Impact protection' : 'Gaz kaynağı DIN 3 (W3) · Darbe koruması',
       },
-      features: ['Açılır flip-front vizör', 'DIN 3 / W3 kaynak filtresi', 'Yan siperlikler', 'Ergonomik saplar', 'Numaralı lens uyumlu', 'ISO 16321 sertifikası']
+      features: currentLang === 'EN' ? ['Flip-front visor', 'DIN 3 / W3 welding filter', 'Side shields', 'Ergonomic temples', 'Prescription lens compatible', 'ISO 16321 certification'] : ['Açılır flip-front vizör', 'DIN 3 / W3 kaynak filtresi', 'Yan siperlikler', 'Ergonomik saplar', 'Numaralı lens uyumlu', 'ISO 16321 sertifikası']
     },
   ];
 
@@ -641,11 +641,11 @@ export default function App() {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8 text-xs font-bold tracking-wider uppercase">
-            <a href="#hero" className="text-slate-700 hover:text-[#1e40af] transition">{t('navHome')}</a>
-            <a href="#products" className="text-slate-700 hover:text-[#1e40af] transition">{t('navProducts')}</a>
-            <a href="#benefits" className="text-slate-700 hover:text-[#1e40af] transition">{t('navBenefits')}</a>
-            <a href="#about" className="text-slate-700 hover:text-[#1e40af] transition">{t('navAbout')}</a>
-            <a href="#contact" className="text-slate-700 hover:text-[#1e40af] transition">{t('navContact')}</a>
+            <a href={`#${t('slugHome')}`} className="text-slate-700 hover:text-[#1e40af] transition">{t('navHome')}</a>
+            <a href={`#${t('slugProducts')}`} className="text-slate-700 hover:text-[#1e40af] transition">{t('navProducts')}</a>
+            <a href={`#${t('slugBenefits')}`} className="text-slate-700 hover:text-[#1e40af] transition">{t('navBenefits')}</a>
+            <a href={`#${t('slugAbout')}`} className="text-slate-700 hover:text-[#1e40af] transition">{t('navAbout')}</a>
+            <a href={`#${t('slugContact')}`} className="text-slate-700 hover:text-[#1e40af] transition">{t('navContact')}</a>
           </nav>
 
           {/* Header Right Actions */}
@@ -710,11 +710,11 @@ export default function App() {
         {/* Mobile Navigation Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-3 uppercase font-semibold text-sm">
-            <a href="#hero" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navHome')}</a>
-            <a href="#products" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navProducts')}</a>
-            <a href="#benefits" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navBenefits')}</a>
-            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navAbout')}</a>
-            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navContact')}</a>
+            <a href={`#${t('slugHome')}`} onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navHome')}</a>
+            <a href={`#${t('slugProducts')}`} onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navProducts')}</a>
+            <a href={`#${t('slugBenefits')}`} onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navBenefits')}</a>
+            <a href={`#${t('slugAbout')}`} onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navAbout')}</a>
+            <a href={`#${t('slugContact')}`} onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1e40af]">{t('navContact')}</a>
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block py-2 text-emerald-600 font-bold flex items-center gap-2">
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.486 1.334 5.006l-1.418 5.176 5.305-1.391c1.464.798 3.116 1.218 4.767 1.219h.004c5.505 0 9.988-4.478 9.99-9.984 0-2.667-1.037-5.174-2.925-7.062-1.887-1.887-4.394-2.924-7.067-2.924zm5.836 14.165c-.247.697-1.442 1.328-1.986 1.398-.501.064-1.157.097-3.708-.958-3.08-1.272-5.074-4.409-5.228-4.614-.153-.205-1.254-1.666-1.254-3.176 0-1.511.792-2.253 1.074-2.56.247-.269.658-.396.932-.396.115 0 .219.006.311.01.27.012.441.026.634.489.247.592.85 2.073.924 2.224.075.152.124.329.025.527-.099.198-.152.329-.304.504-.152.175-.32.392-.457.527-.152.152-.311.318-.135.62.176.302.784 1.293 1.684 2.096 1.157 1.03 2.133 1.349 2.435 1.499.302.15.48.125.658-.078.178-.204.764-.89 1.013-1.246.247-.356.494-.297.823-.175.329.122 2.094 1.029 2.451 1.207.356.178.594.269.681.42.087.151.087.876-.16 1.573z"/></svg>
               {t('whatsappQuick')}
@@ -726,7 +726,7 @@ export default function App() {
       {/* ---------------------------------------------------- */}
       {/* 2. HERO SECTION WITH FULL-BLEED BACKGROUND VIDEO */}
       {/* ---------------------------------------------------- */}
-      <section id="hero" className="relative pt-12 pb-20 text-white overflow-hidden border-b border-slate-800 min-h-[560px] md:min-h-[640px] flex items-center">
+      <section id={t('slugHome')} className="relative pt-12 pb-20 text-white overflow-hidden border-b border-slate-800 min-h-[560px] md:min-h-[640px] flex items-center">
         
         {/* Full-bleed background video */}
         <video
@@ -759,7 +759,7 @@ export default function App() {
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
               <a 
-                href="#products"
+                href={`#${t('slugProducts')}`}
                 className="bg-[#1e40af] hover:bg-blue-600 text-white font-bold text-sm uppercase px-8 py-3.5 rounded-xl transition flex items-center space-x-2 shadow-lg shadow-blue-600/30"
               >
                 <span>{t('heroCtaCollection')}</span>
@@ -834,7 +834,7 @@ export default function App() {
       {/* ---------------------------------------------------- */}
       {/* 3. PRODUCTS SECTION (ALL PRODUCTS & SUB-MODELS) */}
       {/* ---------------------------------------------------- */}
-      <section id="products" className="py-20 bg-slate-50">
+      <section id={t('slugProducts')} className="py-20 bg-slate-50">
         <div className="max-w-[1200px] mx-auto px-4">
           
           <div className="text-center max-w-3xl mx-auto mb-12">
@@ -889,7 +889,7 @@ export default function App() {
                 <div>
                   <div className="relative h-48 bg-slate-100 overflow-hidden flex items-center justify-center p-4 border-b border-slate-100">
                     <span className={`absolute top-3 left-3 z-20 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-full uppercase tracking-wider ${p.badgeBg}`}>
-                      {p.tag}
+                      {t(p.tag)}
                     </span>
                     <ProductImageCarousel
                       images={p.images || [p.img]}
@@ -977,7 +977,7 @@ export default function App() {
                 {[
                   t('kitItem1'),
                   t('kitItem2'),
-                  'Ayarlanabilir elastik kafa bandı',
+                  t('kitItem3'),
                   t('kitItem4'),
                 ].map((line) => (
                   <li key={line} className="flex items-center gap-2.5">
@@ -987,7 +987,7 @@ export default function App() {
                 ))}
               </ul>
               <a
-                href="#products"
+                href={`#${t('slugProducts')}`}
                 className="inline-flex items-center gap-2 bg-[#1e40af] hover:bg-blue-700 text-white font-bold text-xs uppercase px-6 py-3 rounded-xl transition shadow-md shadow-blue-600/20"
               >
                 {t('kitCta')}
@@ -1093,7 +1093,7 @@ export default function App() {
       {/* ---------------------------------------------------- */}
       {/* 4. BENEFITS SECTION */}
       {/* ---------------------------------------------------- */}
-      <section id="benefits" className="py-20 bg-slate-50">
+      <section id={t('slugBenefits')} className="py-20 bg-slate-50">
         <div className="max-w-[1200px] mx-auto px-4">
           
           <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1185,7 +1185,7 @@ export default function App() {
       {/* ---------------------------------------------------- */}
       {/* 5. ABOUT OPTISAFE SECTION */}
       {/* ---------------------------------------------------- */}
-      <section id="about" className="py-20 bg-slate-900 text-white relative overflow-hidden">
+      <section id={t('slugAbout')} className="py-20 bg-slate-900 text-white relative overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-10 lg:gap-14 items-center">
             
@@ -1240,7 +1240,7 @@ export default function App() {
       {/* ---------------------------------------------------- */}
       {/* 6. CONTACT SECTION (OptiSafe Derince/Kocaeli) */}
       {/* ---------------------------------------------------- */}
-      <section id="contact" className="py-20 bg-white">
+      <section id={t('slugContact')} className="py-20 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
           
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -1357,19 +1357,36 @@ export default function App() {
             <div>
               <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">{t('footerBrands')}</h4>
               <ul className="space-y-2 text-xs text-slate-400">
-                <li>Pegaso Organik / Hermetic</li>
-                <li>Pegaso Compact PRO</li>
-                <li>Pegaso Brave / Fever / Moving</li>
-                <li>Pegaso Aguila / Europa / Normal</li>
-                <li>Pegaso Duplex Kaynak</li>
+                <li><a href={`#${t('slugProducts')}`} className="hover:text-white transition">Pegaso Organik / Hermetic</a></li>
+                <li><a href={`#${t('slugProducts')}`} className="hover:text-white transition">Pegaso Compact PRO</a></li>
+                <li><a href={`#${t('slugProducts')}`} className="hover:text-white transition">Pegaso Brave / Fever / Moving</a></li>
+                <li><a href={`#${t('slugProducts')}`} className="hover:text-white transition">Pegaso Aguila / Europa / Normal</a></li>
+                <li><a href={`#${t('slugProducts')}`} className="hover:text-white transition">Pegaso Duplex Kaynak</a></li>
               </ul>
             </div>
 
             <div>
               <h4 className="text-sm font-bold text-white mb-4 font-heading uppercase">{t('footerContact')}</h4>
-              <p className="text-xs text-slate-400">Yenikent Mah. Gazi Mustafa Kemal Cad. No:46H Derince / Kocaeli</p>
-              <p className="text-xs text-slate-400 mt-1">Tel: +90 (539) 589 55 02</p>
-              <p className="text-xs text-slate-400">E-posta: info@optisafe.com.tr</p>
+              <p className="text-xs text-slate-400">
+                <a 
+                  href="https://maps.google.com/?q=Yenikent+Mah.+Gazi+Mustafa+Kemal+Cad.+No:46H+Derince+Kocaeli" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-white transition"
+                >
+                  Yenikent Mah. Gazi Mustafa Kemal Cad. No:46H Derince / Kocaeli
+                </a>
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                <a href="tel:+905395895502" className="hover:text-white transition">
+                  Tel: +90 (539) 589 55 02
+                </a>
+              </p>
+              <p className="text-xs text-slate-400">
+                <a href="mailto:info@optisafe.com.tr" className="hover:text-white transition">
+                  E-posta: info@optisafe.com.tr
+                </a>
+              </p>
             </div>
 
             <div>
@@ -1441,7 +1458,7 @@ export default function App() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <span className={`text-[10px] font-bold text-white px-2.5 py-1 rounded-full uppercase tracking-wider ${selectedProduct.badgeBg}`}>
-                      {selectedProduct.tag}
+                      {t(selectedProduct.tag)}
                     </span>
                     {selectedProduct.rxSupport && (
                       <span className="text-[10px] font-bold text-[#1e40af] bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full uppercase tracking-wider">
